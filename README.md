@@ -22,16 +22,20 @@ live di [spoxydev.fun](https://spoxydev.fun) (GitHub Pages, domain dari file `CN
 | `contracts/SpookyHalloween.sol` | Smart contract ERC-721 (mandiri, tanpa import) |
 | `CNAME` | Domain GitHub Pages: `spoxydev.fun` |
 
-## Status (2 Nov 2026)
+## Status (3 Nov 2026)
 
 - ✅ Situs live di spoxydev.fun
 - ✅ Metadata lengkap 1–10.000, JSON valid, skema atribut konsisten
 - ✅ Kontrak `SpookyHalloween.sol` selesai dan ter-compile bersih (solc 0.8.26, 0 error)
-- ⏳ **Kontrak belum di-deploy** — tombol mint masih nonaktif & prompt Agent masih penanda
-- ⏳ **Gambar koleksi belum di-upload** — kolom `image` di metadata menunjuk ke
-  `collection-master-512/images/<id>.png`, folder itu belum ada di repo
-  (URL gambar saat ini 404). Upload folder gambarnya ke root repo, atau ubah
-  kolom `image` ke URL hosting gambar final sebelum kontrak live.
+- ✅ **Kontrak LIVE di BNB Chain**: `0xC75B0003AC4A5FfaE3feb37278a03d503f344C3f`
+  (tx deploy `0xc4afb1caf3a2313141b7cb3bb35aea65875a793946e871ba1acc93a50dc5538f`,
+  blok 131280953, owner `0x5d372a27da80cfb00f27246b207fc119ce006992`)
+- ✅ **Gambar koleksi lengkap & live** — token 1–1570 karya asli PNG,
+  1571–10000 varian WebP dari 16 master AI + trait (sesuai metadata),
+  #7000 & #10000 karya asli kreator
+- ⏳ **Mint masih TERTUTUP** (`mintOpen = false`) — dibuka owner lewat
+  [deploy.html](https://spoxydev.fun/deploy.html) setelah `setBaseURI`
+- ⏳ `setBaseURI("https://spoxydev.fun/metadata/")` belum dipanggil owner
 
 ## Deploy kontrak (BNB Chain)
 
