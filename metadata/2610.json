@@ -1,7 +1,7 @@
 {
   "name": "Spooky Halloween #2610",
   "description": "A cute pixel Spooky Halloween character from the Spooky Halloween collection. One shared 10,000 pool, drawn at random at mint - the character cannot be chosen.",
-  "image": "collection-master-512/images/2610.png",
+  "image": "https://spoxydev.fun/collection-master-512/images/2610.png",
   "attributes": [
     {
       "trait_type": "Master",
