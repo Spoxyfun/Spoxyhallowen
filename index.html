@@ -4,7 +4,15 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="dark" />
-<link rel="icon" href="data:," />
+<link rel="icon" type="image/webp" href="assets/nft-12.webp" />
+<link rel="icon" type="image/png" sizes="512x512" href="collection-master-512/images/10000.png" />
+<link rel="apple-touch-icon" href="collection-master-512/images/10000.png" />
+<meta name="theme-color" content="#150826" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SPOOKYWEEN" />
+<link rel="manifest" href="manifest.webmanifest" />
 <title>Spooky Halloween — 10.000 NFT Pixel Lucu di BNB Chain</title>
 <meta name="description" content="Spooky Halloween: 10.000 NFT pixel Halloween yang lucu-lucu di BNB Chain. Satu pool bersama 10.000: free mint (fee 0,0001 BNB) dan paid mint (0,001 BNB) mengundi acak dari pool yang sama. Mint sendiri atau lewat AI Agent." />
 <meta property="og:type" content="website" />
@@ -854,6 +862,13 @@
   renderGallery();
   renderTotals();
 })();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("/sw.js").catch(function () {});
+  });
+}
 </script>
 </body>
 </html>

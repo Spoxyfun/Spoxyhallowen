@@ -1,0 +1,33 @@
+{
+  "name": "Spooky Halloween — 10.000 NFT Pixel di BNB Chain",
+  "short_name": "SPOOKYWEEN",
+  "description": "Koleksi 10.000 NFT pixel Spooky Halloween di BNB Chain. Free mint (fee 0,0001 BNB) dan paid mint (0,001 BNB), undian acak oleh smart contract.",
+  "lang": "id",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#150826",
+  "theme_color": "#150826",
+  "icons": [
+    {
+      "src": "/assets/nft-12.webp",
+      "sizes": "772x772",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/nft-12.webp",
+      "sizes": "772x772",
+      "type": "image/webp",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/collection-master-512/images/10000.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
