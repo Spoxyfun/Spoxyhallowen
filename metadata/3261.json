@@ -1,0 +1,35 @@
+{
+  "name": "Spooky Halloween #3261",
+  "description": "A cute pixel Spooky Halloween character from the Spooky Halloween collection. One shared 10,000 pool, drawn at random at mint - the character cannot be chosen.",
+  "image": "collection-master-512/images/3261.png",
+  "attributes": [
+    {
+      "trait_type": "Master",
+      "value": "Zombie Kitten"
+    },
+    {
+      "trait_type": "Mirror",
+      "value": "No"
+    },
+    {
+      "trait_type": "Moon",
+      "value": "Blood"
+    },
+    {
+      "trait_type": "Frame",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Night Grade",
+      "value": "Original"
+    },
+    {
+      "trait_type": "Sky",
+      "value": "Stars+Bats"
+    },
+    {
+      "trait_type": "Finish",
+      "value": "Vivid"
+    }
+  ]
+}
