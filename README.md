@@ -3,6 +3,8 @@
 Situs + metadata koleksi **Spooky Halloween**: 10.000 NFT pixel di BNB Chain,
 live di [spoxydev.fun](https://spoxydev.fun) (GitHub Pages, domain dari file `CNAME`).
 
+Pengembang: [@SpoxyHallow_fun](https://x.com/SpoxyHallow_fun) di X (Twitter).
+
 ## Model koleksi
 
 - **Satu pool bersama** #1–#10.000 untuk semua mint — tanpa pembagian fase.
