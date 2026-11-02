@@ -1,0 +1,35 @@
+{
+  "name": "Spooky Halloween #1378",
+  "description": "A cute pixel Spooky Halloween character from the Spooky Halloween collection. One shared 10,000 pool, drawn at random at mint - the character cannot be chosen.",
+  "image": "collection-master-512/images/1378.png",
+  "attributes": [
+    {
+      "trait_type": "Master",
+      "value": "Vampire Bunny"
+    },
+    {
+      "trait_type": "Mirror",
+      "value": "Yes"
+    },
+    {
+      "trait_type": "Moon",
+      "value": "Original"
+    },
+    {
+      "trait_type": "Frame",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Night Grade",
+      "value": "Original"
+    },
+    {
+      "trait_type": "Sky",
+      "value": "Stars+Bats"
+    },
+    {
+      "trait_type": "Finish",
+      "value": "Matte"
+    }
+  ]
+}
