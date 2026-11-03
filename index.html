@@ -667,110 +667,33 @@
   var CONTRACT_ADDRESS = "0xC75B0003AC4A5FfaE3feb37278a03d503f344C3f"; /* Spooky Halloween contract address on BNB Chain (live). */
   var freeQty = 1, paidQty = 1;
   function renderPrompts(){
-    var w = walletShown();
     var contract = CONTRACT_ADDRESS || (lang==="zh" ? "[合约地址 — 合约上线时公布]" : "[CONTRACT ADDRESS — ANNOUNCED WHEN THE CONTRACT GOES LIVE]");
-    var fWei = 100000000000000 * freeQty, pWei = 1000000000000000 * paidQty;
-    var fHex = "0x" + fWei.toString(16), pHex = "0x" + pWei.toString(16);
-    var fData = "0xa4146733" + freeQty.toString(16).padStart(64, "0");
-    var pData = "0x26c7f77c" + paidQty.toString(16).padStart(64, "0");
     if(lang==="zh"){
       $("promptFree").textContent =
-        "任务：在 BNB Chain 上为我铸造 " + freeQty + " 枚 Spooky Halloween NFT（免费铸造）。\n" +
-        "\n" +
-        "数据（原样使用，不要改动任何数值）：\n" +
-        "- 网络：BNB Chain，chainId 56（0x38）\n" +
+        "在 BNB Chain 上为我铸造 " + freeQty + " 枚 Spooky Halloween NFT（免费铸造）。\n" +
+        "- 系列：Spooky Halloween (SPOOKY)，总供应量 10,000\n" +
         "- 合约：" + contract + "\n" +
-        "- 我的钱包（发送方 + NFT 接收方）：" + w + "\n" +
-        "- 函数：mintFree(" + freeQty + ")\n" +
-        "- Calldata：" + fData + "\n" +
-        "- Value：" + fmtBNB(0.0001*freeQty) + "（" + fWei + " wei，十六进制 " + fHex + "）——这是全部铸造手续费；另请预留少量 BNB 作 gas\n" +
-        "- 公共 RPC（如需）：https://bsc.publicnode.com\n" +
-        "\n" +
-        "步骤：\n" +
-        "1. 先只读检查：调用 mintOpen()——若不是 true，停下来告诉我铸造未开启。再调用 remaining()——若小于 " + freeQty + "，停下来告诉我。\n" +
-        "2. 检查我的钱包余额足够支付上面的 value + gas，不足就停下来告诉我。\n" +
-        "3. 把摘要（合约、数量、总费用）展示给我，并等待我批准。\n" +
-        "4. 我批准后，用上面的 calldata 和 value 从我的钱包发送交易。\n" +
-        "5. 等待回执，从回执日志的 SpookyMinted 事件读取我抽到的代币编号。\n" +
-        "6. 向我汇报：交易哈希、BscScan 链接（https://bscscan.com/tx/<哈希>）、我的代币编号，以及每个代币的链接 https://spoxydev.fun/metadata/<编号>.json\n" +
-        "\n" +
-        "规则：\n" +
-        "- 代币编号由合约从共享池 #1–#10,000 随机抽取，绝不要承诺或试图指定某个编号。\n" +
-        "- 只使用我上面的钱包。绝不要向我索要助记词或私钥。\n" +
-        "- 任一步骤失败就停下来原样报告错误——不要改数值重试，也不要换其他合约。";
+        "- 免费铸造：" + freeQty + " 枚，总计 " + fmtBNB(0.0001*freeQty) + "（仅铸造手续费，另加 gas）\n" +
+        "- 先运行预览并向我展示总费用。在我确认之前不要执行。";
       $("promptPaid").textContent =
-        "任务：在 BNB Chain 上为我铸造 " + paidQty + " 枚 Spooky Halloween NFT（付费铸造）。\n" +
-        "\n" +
-        "数据（原样使用，不要改动任何数值）：\n" +
-        "- 网络：BNB Chain，chainId 56（0x38）\n" +
+        "在 BNB Chain 上为我铸造 " + paidQty + " 枚 Spooky Halloween NFT（付费铸造）。\n" +
+        "- 系列：Spooky Halloween (SPOOKY)，总供应量 10,000\n" +
         "- 合约：" + contract + "\n" +
-        "- 我的钱包（发送方 + NFT 接收方）：" + w + "\n" +
-        "- 函数：mintPaid(" + paidQty + ")\n" +
-        "- Calldata：" + pData + "\n" +
-        "- Value：" + fmtBNB(0.001*paidQty) + "（" + pWei + " wei，十六进制 " + pHex + "）——这是全部价格；另请预留少量 BNB 作 gas\n" +
-        "- 公共 RPC（如需）：https://bsc.publicnode.com\n" +
-        "\n" +
-        "步骤：\n" +
-        "1. 先只读检查：调用 mintOpen()——若不是 true，停下来告诉我铸造未开启。再调用 remaining()——若小于 " + paidQty + "，停下来告诉我。\n" +
-        "2. 检查我的钱包余额足够支付上面的 value + gas，不足就停下来告诉我。\n" +
-        "3. 把摘要（合约、数量、总费用）展示给我，并等待我批准。\n" +
-        "4. 我批准后，用上面的 calldata 和 value 从我的钱包发送交易。\n" +
-        "5. 等待回执，从回执日志的 SpookyMinted 事件读取我抽到的代币编号。\n" +
-        "6. 向我汇报：交易哈希、BscScan 链接（https://bscscan.com/tx/<哈希>）、我的代币编号，以及每个代币的链接 https://spoxydev.fun/metadata/<编号>.json\n" +
-        "\n" +
-        "规则：\n" +
-        "- 代币编号由合约从共享池 #1–#10,000 随机抽取，绝不要承诺或试图指定某个编号。\n" +
-        "- 只使用我上面的钱包。绝不要向我索要助记词或私钥。\n" +
-        "- 任一步骤失败就停下来原样报告错误——不要改数值重试，也不要换其他合约。";
+        "- 付费铸造：" + paidQty + " 枚，总计 " + fmtBNB(0.001*paidQty) + "（另加 gas）\n" +
+        "- 先运行预览并向我展示总费用。在我确认之前不要执行。";
     } else {
       $("promptFree").textContent =
-        "TASK: Mint " + freeQty + " Spooky Halloween NFT(s) for me — FREE mint — on BNB Chain.\n" +
-        "\n" +
-        "DATA (use exactly this — do not change any value):\n" +
-        "- Network: BNB Chain, chainId 56 (0x38)\n" +
+        "Mint " + freeQty + " Spooky Halloween NFT(s) for me on BNB Chain (free mint).\n" +
+        "- Collection: Spooky Halloween (SPOOKY), total supply 10,000\n" +
         "- Contract: " + contract + "\n" +
-        "- My wallet (sender + NFT recipient): " + w + "\n" +
-        "- Function: mintFree(" + freeQty + ")\n" +
-        "- Calldata: " + fData + "\n" +
-        "- Value: " + fmtBNB(0.0001*freeQty) + " (" + fWei + " wei, hex " + fHex + ") — the total mint fee; keep a little extra BNB for gas\n" +
-        "- Public RPC if you need one: https://bsc.publicnode.com\n" +
-        "\n" +
-        "STEPS:\n" +
-        "1. Check first (read-only): call mintOpen() — if it is not true, STOP and tell me mint is closed. Call remaining() — if it is less than " + freeQty + ", STOP and tell me.\n" +
-        "2. Check my wallet balance covers the value above + gas. If not, STOP and tell me.\n" +
-        "3. Show me a summary (contract, amount, total cost) and WAIT for my approval.\n" +
-        "4. After I approve, send the transaction from my wallet with the exact calldata and value above.\n" +
-        "5. Wait for the receipt, then read the token ID(s) I received from the SpookyMinted event in the receipt logs.\n" +
-        "6. Report back: the transaction hash, the BscScan link (https://bscscan.com/tx/<hash>), my token ID(s), and each token's link https://spoxydev.fun/metadata/<id>.json\n" +
-        "\n" +
-        "RULES:\n" +
-        "- Token IDs are drawn at random by the contract from the shared pool #1–#10,000. Never promise or try to pick a specific number.\n" +
-        "- Only use my wallet above. Never ask for my seed phrase or private key.\n" +
-        "- If any step fails, stop and report the exact error — do not retry with changed values and do not use a different contract.";
+        "- Free mint: " + freeQty + " NFT(s), " + fmtBNB(0.0001*freeQty) + " total (mint fee only, plus gas)\n" +
+        "- Run a preview first and show me the total cost. Do NOT execute until I confirm.";
       $("promptPaid").textContent =
-        "TASK: Mint " + paidQty + " Spooky Halloween NFT(s) for me — PAID mint — on BNB Chain.\n" +
-        "\n" +
-        "DATA (use exactly this — do not change any value):\n" +
-        "- Network: BNB Chain, chainId 56 (0x38)\n" +
+        "Mint " + paidQty + " Spooky Halloween NFT(s) for me on BNB Chain (paid mint).\n" +
+        "- Collection: Spooky Halloween (SPOOKY), total supply 10,000\n" +
         "- Contract: " + contract + "\n" +
-        "- My wallet (sender + NFT recipient): " + w + "\n" +
-        "- Function: mintPaid(" + paidQty + ")\n" +
-        "- Calldata: " + pData + "\n" +
-        "- Value: " + fmtBNB(0.001*paidQty) + " (" + pWei + " wei, hex " + pHex + ") — the total price; keep a little extra BNB for gas\n" +
-        "- Public RPC if you need one: https://bsc.publicnode.com\n" +
-        "\n" +
-        "STEPS:\n" +
-        "1. Check first (read-only): call mintOpen() — if it is not true, STOP and tell me mint is closed. Call remaining() — if it is less than " + paidQty + ", STOP and tell me.\n" +
-        "2. Check my wallet balance covers the value above + gas. If not, STOP and tell me.\n" +
-        "3. Show me a summary (contract, amount, total cost) and WAIT for my approval.\n" +
-        "4. After I approve, send the transaction from my wallet with the exact calldata and value above.\n" +
-        "5. Wait for the receipt, then read the token ID(s) I received from the SpookyMinted event in the receipt logs.\n" +
-        "6. Report back: the transaction hash, the BscScan link (https://bscscan.com/tx/<hash>), my token ID(s), and each token's link https://spoxydev.fun/metadata/<id>.json\n" +
-        "\n" +
-        "RULES:\n" +
-        "- Token IDs are drawn at random by the contract from the shared pool #1–#10,000. Never promise or try to pick a specific number.\n" +
-        "- Only use my wallet above. Never ask for my seed phrase or private key.\n" +
-        "- If any step fails, stop and report the exact error — do not retry with changed values and do not use a different contract.";
+        "- Paid mint: " + paidQty + " NFT(s), " + fmtBNB(0.001*paidQty) + " total (plus gas)\n" +
+        "- Run a preview first and show me the total cost. Do NOT execute until I confirm.";
     }
   }
   function renderTotals(){
