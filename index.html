@@ -367,7 +367,7 @@
         </div>
         <div class="statusbar">
           <span class="dot" aria-hidden="true"></span>
-          <span id="statusBarText" data-i18n="statusPreview"><strong>Preview:</strong> the contract is live on BNB Chain — mint will be opened by the owner soon. Minted 0 / 10,000 • Shared pool left 10,000</span>
+          <span id="statusBarText" data-i18n="statusPreview"><strong>Live:</strong> mint is OPEN on BNB Chain. Minted 0 / 10,000 • Shared pool left 10,000</span>
         </div>
       </div>
       <div class="hero-art">
@@ -404,8 +404,8 @@
 
       <div class="live-panel">
         <div class="live-head">
-          <span class="l"><span class="dot" aria-hidden="true"></span><span id="liveStateText" data-i18n="liveState">CONTRACT LIVE — MINT OPENS SOON</span></span>
-          <span class="r" id="liveNoteText" data-i18n="liveNote">On-chain live numbers will appear here once mint opens</span>
+          <span class="l"><span class="dot" aria-hidden="true"></span><span id="liveStateText" data-i18n="liveState">LIVE — MINT IS OPEN</span></span>
+          <span class="r" id="liveNoteText" data-i18n="liveNote">Live numbers from the BNB Chain contract</span>
         </div>
         <div class="live-nums">
           <div class="live-num"><div class="v t" id="liveMintedNum">0</div><div class="k" data-i18n="liveMinted">MINTED / 10,000</div></div>
@@ -439,8 +439,8 @@
             </div>
           </div>
           <div class="total-row"><span data-i18n="totalFee">Total fee</span><span class="tv" id="freeTotal">0,0001 BNB</span></div>
-          <button class="btn green" type="button" id="btnMintFree" disabled>Mint Not Open Yet</button>
-          <p class="fineprint" data-i18n="freeFine">The total sent to the contract is just the fee: mint amount × 0.0001 BNB. The button activates once the owner opens mint.</p>
+          <button class="btn green" type="button" id="btnMintFree" disabled>Mint Free</button>
+          <p class="fineprint" data-i18n="freeFine">Mint is open — the total sent to the contract is just the fee: mint amount × 0.0001 BNB.</p>
         </article>
 
         <article class="phase-card paid">
@@ -460,7 +460,7 @@
             </div>
           </div>
           <div class="total-row"><span data-i18n="totalPrice">Total price</span><span class="tv" id="paidTotal">0,001 BNB</span></div>
-          <button class="btn orange" type="button" id="btnMintPaid" disabled>Mint Not Open Yet</button>
+          <button class="btn orange" type="button" id="btnMintPaid" disabled>Mint Paid</button>
           <p class="fineprint" data-i18n="paidFine">Total sent to the contract: mint amount × 0.001 BNB. Make sure your BNB balance covers the price plus BNB Chain gas.</p>
         </article>
       </div>
@@ -472,7 +472,7 @@
         <div class="shuffle-body">
           <div class="pk" data-i18n="shuffleK">RANDOM DRAW • PREVIEW SIMULATION</div>
           <h3 data-i18n="shuffleTitle">Try the Random Draw</h3>
-          <p data-i18n="shuffleDesc">This is how minting works: you <strong>do not choose</strong> your Spooky. For every mint — free or paid — the contract draws <strong>one random unminted token</strong> from the shared #1–#10,000 pool. The button below only draws from the 12 gallery sample characters as a simulation — real mint results are decided by the contract on BNB Chain once mint opens.</p>
+          <p data-i18n="shuffleDesc">This is how minting works: you <strong>do not choose</strong> your Spooky. For every mint — free or paid — the contract draws <strong>one random unminted token</strong> from the shared #1–#10,000 pool. The button below only draws from the 12 gallery sample characters as a simulation — real mint results are decided by the contract on BNB Chain.</p>
           <div class="shuffle-result" id="shuffleResult" data-i18n="shuffleIdle">Press the draw button to shuffle one sample character.</div>
           <button class="btn orange" id="shuffleBtn" type="button" data-i18n="shuffleBtn">Draw at Random (Simulation)</button>
         </div>
@@ -525,7 +525,7 @@
         <div class="faq"><h3 data-i18n="q3">How much is the paid mint?</h3><p data-i18n="a3"><strong>0.001 BNB per NFT</strong>, drawing from the same shared pool as the free mint (#1–#10,000). The total sent is mint amount × 0.001 BNB, plus BNB Chain gas.</p></div>
         <div class="faq"><h3 data-i18n="q4">Can I mint without connecting a wallet manually?</h3><p data-i18n="a4">Yes. Paste your wallet address in the <strong>AI Agent</strong> section — both prompts fill in automatically — then copy the prompt and send it to your AI agent with access to a BNB Chain wallet.</p></div>
         <div class="faq"><h3 data-i18n="q5">Can I mint with a Binance Agent ID?</h3><p data-i18n="a5">Yes. If your wallet holds a <strong>Binance Agent ID</strong>, you can mint with it just like a regular wallet. The agent prompts above work for agent wallets too.</p></div>
-        <div class="faq"><h3 data-i18n="q6">When does mint open?</h3><p data-i18n="a6">Mint opens when the <strong>owner opens it on the live contract</strong>. The address published on this page (and in the prompts above) is the only official contract address — there is no other official contract address.</p></div>
+        <div class="faq"><h3 data-i18n="q6">When does mint open?</h3><p data-i18n="a6">Mint is <strong>now open</strong> — the owner has opened it on the live contract, and anyone can mint from this page. The address published on this page (and in the prompts above) is the only official contract address — there is no other official contract address.</p></div>
         <div class="faq"><h3 data-i18n="q7">Can I choose my NFT or token number?</h3><p data-i18n="a7">No. Every mint is <strong>drawn at random by the contract</strong> from the unminted tokens in one shared pool #1–#10,000 — free mints and paid mints draw from the same pool. A token can never be drawn twice: once minted, it leaves the pool for good. Your token number is only known after your mint transaction succeeds.</p></div>
       </div>
     </div>
@@ -577,7 +577,7 @@
         "statFree": "免费铸造 — 0.0001 BNB 手续费，从共享池抽取",
         "statPaid": "付费铸造 — 每枚 0.001 BNB，同一个池",
         "statChain": "BNB Chain（链 ID 56）",
-        "statusPreview": "<strong>预览：</strong>合约已在 BNB Chain 上线——铸造将由所有者很快开启。已铸造 0 / 10,000 • 共享池剩余 10,000",
+        "statusPreview": "<strong>进行中：</strong>铸造已在 BNB Chain 开启。已铸造 0 / 10,000 • 共享池剩余 10,000",
         "tagFree": "免费铸造 + 0.0001 BNB 手续费",
         "tagSupply": "总量 10,000 • 像素 NFT",
         "heroCapName": "“King Boo”",
@@ -587,8 +587,8 @@
         "galIntro": "每一个 Spooky 都是一像素一像素画出来的：可爱的幽灵、女巫猫、小蝙蝠，一直到传奇的金色幽灵。物种、服装和配饰的组合让每一枚代币都看起来不一样。所有代币 #1–#10,000 都位于<strong>同一个共享池</strong>中，供免费铸造和付费铸造共同使用——不再按阶段分池。下面样品上的编号只是展示用：<strong>当你铸造时，合约会从共享池中随机抽取一枚未铸造的代币</strong>，所以没有人能挑选或预测自己会得到哪一只 Spooky。这里只是 10,000 枚中的 12 个样品。",
         "mintTitle": "选择你的铸造方式",
         "mintIntro": "先连接你的钱包，然后选择铸造方式：免费或付费——<strong>两者都从同一个 10,000 枚代币的共享池（#1–#10,000）中抽取</strong>，没有 5,000 / 5,000 的分阶段拆分。0.0001 BNB 的免费铸造手续费作为创作者费用进入合约。付费铸造为每枚 0.001 BNB。<strong>铸造结果是随机的：</strong>每一次铸造，合约都会从共享池中随机抽取一枚未铸造的代币——不是按顺序的下一枚——你的代币编号只有在交易成功后才会知道。你也可以使用持有 <strong>Binance Agent ID</strong> 的钱包铸造——它和普通钱包一样使用，没有额外步骤。",
-        "liveState": "合约已上线 — 铸造即将开启",
-        "liveNote": "铸造开启后，这里将显示合约的实时数据",
+        "liveState": "已上线 — 铸造进行中",
+        "liveNote": "来自 BNB Chain 合约的实时数据",
         "liveMinted": "已铸造 / 10,000",
         "liveFree": "共享池剩余 / 10,000",
         "livePaid": "铸造方式 — 免费与付费，同一个池",
@@ -602,7 +602,7 @@
         "qtyLabel": "铸造数量",
         "totalFee": "手续费总计",
         "btnSoon": "铸造尚未开启",
-        "freeFine": "发送到合约的总额只是手续费：铸造数量 × 0.0001 BNB。所有者开启铸造后按钮即会激活。",
+        "freeFine": "铸造已开启——发送到合约的总额只是手续费：铸造数量 × 0.0001 BNB。",
         "paidPhaseK": "共享池 #1–#10,000 • 随机抽取",
         "allocPaid": "共享池：10,000 枚 NFT — 免费与付费共用",
         "paidDesc": "每枚 NFT 价格 <strong>0.001 BNB</strong>。只要共享池还有剩余，付费铸造随时可用——无需等待免费铸造结束——你收到的代币<strong>从未铸造的共享 #1–#10,000 池中随机抽取</strong>，与免费铸造一样。代币编号不能自选。",
@@ -617,7 +617,7 @@
         "step3": "点击铸造按钮并在钱包中确认交易。合约会从共享池中随机抽取一枚未铸造的代币，铸造成功后，你抽到的代币编号会显示在交易中。",
         "shuffleK": "随机抽取 • 预览模拟",
         "shuffleTitle": "试试随机抽取",
-        "shuffleDesc": "铸造就是这样运作的：你<strong>不能挑选</strong>你的 Spooky。每一次铸造——免费或付费——合约都会从共享的 #1–#10,000 池中抽取<strong>一枚随机的未铸造代币</strong>。下面的按钮仅从 12 个画廊样品角色中抽取作为模拟——真正的铸造结果由 BNB Chain 上的合约在铸造开启后决定。",
+        "shuffleDesc": "铸造就是这样运作的：你<strong>不能挑选</strong>你的 Spooky。每一次铸造——免费或付费——合约都会从共享的 #1–#10,000 池中抽取<strong>一枚随机的未铸造代币</strong>。下面的按钮仅从 12 个画廊样品角色中抽取作为模拟——真正的铸造结果由 BNB Chain 上的合约决定。",
         "shuffleIdle": "按下抽取按钮，随机抽一个样品角色。",
         "shuffleBtn": "随机抽取（模拟）",
         "agentKicker": "通过 AI 代理铸造",
@@ -642,7 +642,7 @@
         "q5": "可以用 Binance Agent ID 铸造吗？",
         "a5": "可以。如果你的钱包持有 <strong>Binance Agent ID</strong>，你可以像使用普通钱包一样用它铸造。上面的代理提示词也适用于代理钱包。",
         "q6": "铸造什么时候开启？",
-        "a6": "当<strong>所有者在已上线的合约上开启铸造</strong>时即开启。本页面公布的地址（以及上方提示词中的地址）是唯一的官方合约地址——没有其他官方合约地址。",
+        "a6": "铸造<strong>现已开启</strong>——所有者已在已上线的合约上开启铸造，任何人都可以在本页面铸造。本页面公布的地址（以及上方提示词中的地址）是唯一的官方合约地址——没有其他官方合约地址。",
         "q7": "我能挑选我的 NFT 或代币编号吗？",
         "a7": "不能。每一次铸造都由<strong>合约从一个共享池 #1–#10,000 中未铸造的代币里随机抽取</strong>——免费铸造和付费铸造从同一个池抽取。一枚代币永远不会被抽中两次：一旦铸造，它就永远离开池子。你的代币编号只有在铸造交易成功后才会知道。",
         "footLine": "总量 10,000 • 一个共享池 • 免费铸造（0.0001 BNB 手续费）• 付费铸造（0.001 BNB）• BNB Chain",
@@ -912,7 +912,7 @@
   var LM = {
     en: { liveStateOpen:"LIVE — MINT IS OPEN", liveNoteLive:"Live numbers from the BNB Chain contract",
       mintFree:"Mint Free", mintPaid:"Mint Paid", notOpen:"Mint Not Open Yet",
-      statusOpen:"<strong>Live:</strong> mint is OPEN on BNB Chain.", statusClosed:"<strong>Preview:</strong> the contract is live on BNB Chain — mint will be opened by the owner soon.",
+      liveStateClosed:"CONTRACT LIVE — MINT CLOSED", statusOpen:"<strong>Live:</strong> mint is OPEN on BNB Chain.", statusClosed:"<strong>Preview:</strong> the contract is live on BNB Chain — mint is currently CLOSED.",
       mintedOf:"Minted", poolLeft:"Shared pool left",
       sending:"Sending… confirm the transaction in your wallet.", waiting:"Transaction sent — waiting for confirmation…",
       viewTx:"View on BscScan", success:"\u{1F389} Mint successful! You drew token ", successMulti:"\u{1F389} Mint successful! You drew tokens ",
@@ -921,7 +921,7 @@
       progress:"Mint progress " },
     zh: { liveStateOpen:"已上线 — 铸造进行中", liveNoteLive:"来自 BNB Chain 合约的实时数据",
       mintFree:"免费铸造", mintPaid:"付费铸造", notOpen:"铸造尚未开启",
-      statusOpen:"<strong>进行中：</strong>铸造已在 BNB Chain 开启。", statusClosed:"<strong>预览：</strong>合约已在 BNB Chain 上线——铸造将由所有者很快开启。",
+      liveStateClosed:"合约已上线 — 铸造已关闭", statusOpen:"<strong>进行中：</strong>铸造已在 BNB Chain 开启。", statusClosed:"<strong>预览：</strong>合约已在 BNB Chain 上线——铸造目前处于关闭状态。",
       mintedOf:"已铸造", poolLeft:"共享池剩余",
       sending:"正在发送……请在钱包中确认。", waiting:"交易已发送——等待确认……",
       viewTx:"在 BscScan 查看", success:"\u{1F389} 铸造成功！你抽到了代币 ", successMulti:"\u{1F389} 铸造成功！你抽到了代币 ",
@@ -974,7 +974,7 @@
       $("liveNoteText").textContent = lm("liveNoteLive");
       $("statusBarText").innerHTML = lm("statusOpen") + " " + lm("mintedOf") + " " + fmtNum(m) + " / 10,000 • " + lm("poolLeft") + " " + fmtNum(rem);
     } else {
-      $("liveStateText").textContent = lang === "zh" ? I18N.zh.liveState : enCache.liveState;
+      $("liveStateText").textContent = lm("liveStateClosed");
       $("liveNoteText").textContent = lang === "zh" ? I18N.zh.liveNote : enCache.liveNote;
       $("statusBarText").innerHTML = lm("statusClosed") + " " + lm("mintedOf") + " " + fmtNum(m) + " / 10,000 • " + lm("poolLeft") + " " + fmtNum(rem);
     }

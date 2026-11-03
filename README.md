@@ -35,9 +35,11 @@ Pengembang: [@SpoxyHallow_fun](https://x.com/SpoxyHallow_fun) di X (Twitter).
 - ✅ **Gambar koleksi lengkap & live** — token 1–1570 karya asli PNG,
   1571–10000 varian WebP dari 16 master AI + trait (sesuai metadata),
   #7000 & #10000 karya asli kreator
-- ⏳ **Mint masih TERTUTUP** (`mintOpen = false`) — dibuka owner lewat
-  [deploy.html](https://spoxydev.fun/deploy.html) setelah `setBaseURI`
-- ⏳ `setBaseURI("https://spoxydev.fun/metadata/")` belum dipanggil owner
+- ✅ **Mint TERBUKA** (`mintOpen = true`) — dibuka owner lewat
+  [deploy.html](https://spoxydev.fun/deploy.html) pada 3 Nov 2026; tombol mint
+  di situs aktif dan membaca status live dari chain
+- ✅ `setBaseURI("https://spoxydev.fun/metadata/")` sudah diset owner
+  (terverifikasi on-chain)
 
 ## Deploy kontrak (BNB Chain)
 
