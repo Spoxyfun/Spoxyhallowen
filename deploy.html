@@ -3,243 +3,406 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SPOOKY · Deploy &amp; Manage Contract — Owner Tool</title>
-<meta name="robots" content="noindex">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<title>Spooky Halloween · Deploy &amp; Manage Contract — Owner Tool</title>
+<meta name="description" content="Owner tool for the Spooky Halloween contract — deploy & manage on BNB Chain. Mint opens only by the owner's own signature.">
+<link rel="icon" href="assets/nft-12.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#150826;--card:#22103f;--line:#3d2066;--txt:#f3eaff;--dim:#bda8e6;--org:#ffa726;--pur:#b388ff;--grn:#69f0ae;--red:#ff6e6e}
-  *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:linear-gradient(180deg,#150826,#1e0b38);color:var(--txt);min-height:100vh}
-  .wrap{max-width:820px;margin:0 auto;padding:24px 16px 64px}
-  h1{font-size:26px;margin:8px 0 2px} h2{font-size:17px;margin:0 0 12px;color:var(--org)}
-  .sub{color:var(--dim);margin:0 0 18px}
-  .warn{background:#3a1030;border:1px solid #8e2455;border-radius:12px;padding:12px 14px;font-size:14px;margin-bottom:18px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
-  button{background:var(--org);color:#22103f;border:0;border-radius:10px;padding:11px 18px;font-weight:700;font-size:15px;cursor:pointer;margin:4px 6px 4px 0}
-  button.sec{background:transparent;color:var(--pur);border:1px solid var(--pur)}
-  button.danger{background:var(--red);color:#2b0606}
-  button:disabled{opacity:.45;cursor:not-allowed}
-  input{width:100%;background:#170a2c;border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:11px 12px;font-size:14px;font-family:ui-monospace,Menlo,monospace;margin:6px 0 10px}
-  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-  .kv{font-family:ui-monospace,Menlo,monospace;font-size:13.5px;word-break:break-all}
-  .dim{color:var(--dim);font-size:13.5px}
-  .badge{display:inline-block;padding:3px 12px;border-radius:999px;font-weight:800;font-size:13px;letter-spacing:.4px}
-  .b-closed{background:#5c1130;color:#ffb3c1}.b-open{background:#0f4d2e;color:var(--grn)}
-  #log{background:#0d0519;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:ui-monospace,Menlo,monospace;font-size:12.8px;white-space:pre-wrap;word-break:break-word;height:210px;overflow:auto}
-  a{color:var(--pur)} .big{font-size:16px}
-  .hidden{display:none}
+:root{--bg:#150826;--panel:#1d0b38;--panel2:#241048;--line:#3b2566;--text:#f6f1ff;--muted:#b3a4d6;--acc:#ffa31a;--violet:#a78bfa;--red:#ff7a7a;--green:#7ee787}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle,#33205e 1.3px,transparent 1.4px),radial-gradient(circle,#21103f 1px,transparent 1.1px);background-size:26px 26px,13px 13px;opacity:.65}
+a{color:var(--violet)}
+.wrap{max-width:880px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
+header{border-bottom:1px solid var(--line);background:rgba(21,8,38,.86);backdrop-filter:blur(12px);position:sticky;top:0;z-index:50}
+.hbar{display:flex;align-items:center;justify-content:space-between;height:72px;max-width:880px;margin:0 auto;padding:0 22px}
+.brand{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none}
+.brand img{width:46px;height:46px;border-radius:12px}
+.brand .bname{font-weight:700;font-size:20px;letter-spacing:.4px;line-height:1}
+.brand .bname span{color:var(--acc)}
+.brand .bsub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2.5px;margin-top:4px}
+.langsw{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.langsw button{background:transparent;color:var(--muted);border:0;padding:9px 14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;cursor:pointer}
+.langsw button.on{background:var(--acc);color:#23103f;font-weight:600}
+h1{font-size:clamp(26px,4vw,38px);letter-spacing:-.5px;margin:40px 0 8px}
+h1 span{color:var(--acc)}
+.sub{color:var(--muted);line-height:1.65;margin-bottom:22px}
+.warn{border:1px dashed #6b4a00;background:rgba(255,163,26,.07);color:#ffd88a;border-radius:14px;padding:16px 18px;font-size:14.5px;line-height:1.7;margin-bottom:30px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;margin-bottom:18px}
+.step h2{font-size:19px;margin-bottom:12px}
+.step h2 .n{color:var(--acc);font-family:'IBM Plex Mono',monospace;font-size:15px;margin-right:8px}
+.step p{color:var(--muted);font-size:14.5px;line-height:1.65;margin-bottom:12px}
+.step p b{color:var(--text)}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--acc);color:#23103f;font-weight:700;border:0;border-radius:999px;padding:11px 20px;cursor:pointer;font-family:inherit;font-size:14.5px;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.violet{background:var(--violet);color:#1d0b38}
+.btn.red{background:transparent;color:var(--red);border:1px solid #5a2b3b}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:10px}
+input[type=text],select{background:#0f051e;border:1px solid var(--line);border-radius:12px;color:var(--text);padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13.5px;width:100%}
+select{width:auto;cursor:pointer}
+.addr{flex:1;min-width:260px}
+.mono{font-family:'IBM Plex Mono',monospace}
+.status{font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.75;color:#ddd3f5;background:#0f051e;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:14px;white-space:pre-wrap;word-break:break-word}
+.status:empty{display:none}
+.status.ok{border-color:#2f5d3a;color:#a7e8b0}
+.status.err{border-color:#6e2f35;color:#ffb3b3}
+.status a{color:var(--violet)}
+#mintStatusText.open{color:var(--green)}
+#mintStatusText.closed{color:var(--red)}
+footer{color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:12.5px;padding:14px 0 44px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>🎃 SPOOKY · Deploy &amp; Manage Contract</h1>
-  <p class="sub">Owner tool for the <b>Spooky Halloween (SPOOKY)</b> contract — ERC-721, BNB Chain, one shared pool of 10,000 NFTs.</p>
-  <div class="warn">🔐 <b>Owner tool.</b> Your wallet signs everything; keys never leave your wallet. The contract is unaudited — test on BNB Testnet first if in doubt. <b>Mint is NOT opened automatically after deploy</b> — it always starts <b>CLOSED</b> and only opens when the owner signs the “Open Mint” transaction in step 5.</div>
 
-  <div class="card">
-    <h2>1. Network &amp; Wallet</h2>
-    <div class="row">
-      <button id="btnConnect">Connect Wallet</button>
-      <button class="sec" id="btnMainnet">BNB Chain (Mainnet)</button>
-      <button class="sec" id="btnTestnet">BNB Testnet</button>
+<header>
+  <div class="hbar">
+    <a class="brand" href="index.html">
+      <img src="assets/nft-12.webp" alt="Spooky Halloween logo">
+      <div><div class="bname">SPOOKY<span>WEEN</span></div><div class="bsub">● SPOOKY HALLOWEEN ●</div></div>
+    </a>
+    <div class="langsw">
+      <button id="langEn" class="on" onclick="setLang('en')">EN</button>
+      <button id="langZh" onclick="setLang('zh')">中文</button>
     </div>
-    <p class="kv" id="walletInfo">Wallet not connected.</p>
   </div>
+</header>
 
-  <div class="card">
-    <h2>2. Deploy the SpookyHalloween Contract</h2>
-    <p class="dim">Name: Spooky Halloween · Symbol: SPOOKY · Max supply: 10,000 · Free mint: 0.0001 BNB/NFT · Paid mint: 0.001 BNB/NFT · Max 10 per transaction. No constructor arguments. After a successful deploy, the contract address fills in automatically in step 3.</p>
-    <button id="btnDeploy" disabled>🚀 Deploy Contract</button>
-    <p class="kv" id="deployInfo"></p>
-    <p class="dim">Remember: deploying does <b>not</b> open mint and does <b>not</b> set the base URI. Both are separate steps the owner signs themselves (steps 4 &amp; 5).</p>
-  </div>
+<main class="wrap">
+  <h1 data-i18n-html="title">DEPLOY &amp; MANAGE <span>CONTRACT</span></h1>
+  <p class="sub" data-i18n="intro">Owner tool for the Spooky Halloween contract — ERC-721, BNB Chain, 10,000 pixel NFTs in one shared pool. Every action on this page is signed by your own wallet.</p>
 
-  <div class="card">
-    <h2>3. Contract Address</h2>
-    <input id="inpAddr" placeholder="0x… deployed contract address">
-    <div class="row">
-      <button class="sec" id="btnLoad">Load Contract</button>
-      <button class="sec" id="btnCopy">Copy Address</button>
-      <a id="lnkScan" class="hidden" target="_blank" rel="noopener">View on BscScan ↗</a>
+  <div class="warn" data-i18n-html="warn">🔐 <b>Owner tool.</b> Your wallet signs everything; keys never leave your wallet. The contract is unaudited — test on BNB Testnet first if in doubt. <b>Mint is NOT opened automatically after deploy</b> — it always starts <b>CLOSED</b> and only opens when the owner signs the “Open Mint” transaction in step 5.</div>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <h2><span class="n">1</span><span data-i18n="s1t">Network &amp; Wallet</span></h2>
+    <div class="row" style="margin-top:0">
+      <select id="networkSel" onchange="onNetworkChange()">
+        <option value="56">BNB Chain — Mainnet</option>
+        <option value="97">BNB Chain — Testnet</option>
+      </select>
+      <button class="btn" id="connectBtn" onclick="connectWallet()" data-i18n="connect">Connect Wallet</button>
     </div>
-    <p class="kv" id="statusInfo">Contract status not loaded yet.</p>
-    <p class="dim">The live contract (0xC75B…4C3f) is already wired into the site — paste its address here to manage the base URI, mint status and withdrawals.</p>
+    <div class="status" id="walletStatus"></div>
   </div>
 
-  <div class="card">
-    <h2>4. Metadata Base URI (owner signature)</h2>
-    <input id="inpBase" value="https://spoxydev.fun/metadata/">
-    <button id="btnBase" disabled>Set Base URI</button>
-    <p class="dim">tokenURI setiap NFT = base URI + id + “.json”, contoh: https://spoxydev.fun/metadata/1.json</p>
-  </div>
-
-  <div class="card">
-    <h2>5. Mint (owner signature)</h2>
-    <p class="big">Mint status: <span class="badge b-closed" id="mintBadge">—</span></p>
+  <!-- STEP 2 -->
+  <div class="step">
+    <h2><span class="n">2</span><span data-i18n="s2t">Deploy the SpookyHalloween Contract</span></h2>
+    <p data-i18n-html="s2p">Name: <b>Spooky Halloween</b> · Symbol: <b>SPOOKY</b> · Max supply: <b>10,000</b> · Free mint: <b>0.0001 BNB fee</b> · Paid mint: <b>0.001 BNB</b> · Max <b>10</b> per transaction · Free &amp; paid draw from <b>one shared pool</b>. No constructor arguments. After a successful deploy, the contract address fills in automatically in step 3.</p>
+    <p data-i18n="s2note">Remember: deploying does not open mint and does not set the base URI. Both are separate steps the owner signs themselves (steps 4 &amp; 5).</p>
     <div class="row">
-      <button id="btnOpen" disabled>🔓 Open Mint</button>
-      <button class="danger" id="btnClose" disabled>🔒 Close Mint</button>
+      <button class="btn violet" id="deployBtn" onclick="deployContract()" data-i18n="deploy">Deploy Contract</button>
     </div>
-    <p class="dim">Mint status only changes when the owner signs this transaction. “Open Mint” asks for one more confirmation before it is sent to your wallet.</p>
+    <div class="status" id="deployStatus"></div>
   </div>
 
-  <div class="card">
-    <h2>6. Withdraw Funds (owner signature)</h2>
-    <p class="kv" id="balInfo">Contract balance: —</p>
-    <button id="btnWithdraw" disabled>Withdraw All BNB to Owner</button>
+  <!-- STEP 3 -->
+  <div class="step">
+    <h2><span class="n">3</span><span data-i18n="s3t">Contract Address</span></h2>
+    <div class="row" style="margin-top:0">
+      <input type="text" class="addr" id="contractAddr" placeholder="0x…" value="0xC75B0003AC4A5FfaE3feb37278a03d503f344C3f">
+      <button class="btn ghost" onclick="loadStatus()" data-i18n="load">Load Status</button>
+    </div>
+    <div class="status" id="contractStatus"></div>
   </div>
 
-  <div class="card">
-    <h2>Log</h2>
-    <div id="log"></div>
+  <!-- STEP 4 -->
+  <div class="step">
+    <h2><span class="n">4</span><span data-i18n="s4t">Metadata Base URI (owner signature)</span></h2>
+    <p data-i18n-html="s4p">tokenURI of every NFT = base URI + token id + “.json”, e.g. <span class="mono" style="color:var(--text)">https://spoxydev.fun/metadata/1.json</span> — the metadata files are already live on your own domain, and the live contract’s base URI is already set to this value.</p>
+    <div class="row" style="margin-top:0">
+      <input type="text" class="addr" id="baseUriInput" value="https://spoxydev.fun/metadata/">
+      <button class="btn ghost" onclick="setBaseURI()" data-i18n="setUri">Set Base URI</button>
+    </div>
+    <div class="status" id="uriStatus"></div>
   </div>
-</div>
 
+  <!-- STEP 5 -->
+  <div class="step">
+    <h2><span class="n">5</span><span data-i18n="s5t">Mint (owner signature)</span></h2>
+    <p><span data-i18n="mintStatusLabel">Mint status:</span> <b id="mintStatusText">—</b></p>
+    <p data-i18n="s5p">Mint status only changes when the owner signs this transaction. “Open Mint” asks for one more confirmation before it is sent to your wallet.</p>
+    <div class="row">
+      <button class="btn" onclick="setMint(true)" data-i18n="openMint">Open Mint</button>
+      <button class="btn red" onclick="setMint(false)" data-i18n="closeMint">Close Mint</button>
+    </div>
+    <div class="status" id="mintTxStatus"></div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step">
+    <h2><span class="n">6</span><span data-i18n="s6t">Withdraw Funds (owner signature)</span></h2>
+    <p><span data-i18n="balLabel">Contract balance:</span> <b id="balanceText">—</b></p>
+    <div class="row">
+      <button class="btn ghost" onclick="withdraw()" data-i18n="withdraw">Withdraw to Owner</button>
+    </div>
+    <div class="status" id="withdrawStatus"></div>
+  </div>
+
+  <footer>
+    <span data-i18n="foot">SPOOKYWEEN · OWNER TOOL ·</span> <a href="index.html" data-i18n="back">← Back to the mint page</a>
+  </footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
 const BYTECODE = "60806040526127106003553480156014575f80fd5b505f80546001600160a01b0319163390811782556040519091907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a3611c8c806100605f395ff3fe6080604052600436106101af575f3560e01c806370a08231116100e7578063c37b836211610087578063e985e9c511610062578063e985e9c5146104c6578063f2fde38b1461050d578063f43a22dc1461052c578063f8004d3114610540575f80fd5b8063c37b836214610474578063c87b56dd1461048e578063de4d1aad146104ad575f80fd5b8063a22cb465116100c2578063a22cb4651461040f578063a2309ff81461042e578063a414673314610442578063b88d4fde14610455575f80fd5b806370a08231146103a15780638da5cb5b146103c057806395d89b41146103de575f80fd5b806332cb6b0c1161015257806355234ec01161012d57806355234ec01461033b57806355f804b31461034f5780636352211e1461036e5780636c0360eb1461038d575f80fd5b806332cb6b0c146102e55780633ccfd60b1461030857806342842e0e1461031c575f80fd5b8063095ea7b31161018d578063095ea7b31461026657806323b872dd1461028757806324bbd049146102a657806326c7f77c146102c5575f80fd5b806301ffc9a7146101b357806306fdde03146101e7578063081812fc1461022f575b5f80fd5b3480156101be575f80fd5b506101d26101cd3660046115d1565b61055f565b60405190151581526020015b60405180910390f35b3480156101f2575f80fd5b506102226040518060400160405280601081526020016f29b837b7b5bc902430b63637bbb2b2b760811b81525081565b6040516101de919061161a565b34801561023a575f80fd5b5061024e61024936600461162c565b6105b0565b6040516001600160a01b0390911681526020016101de565b348015610271575f80fd5b5061028561028036600461165e565b610607565b005b348015610292575f80fd5b506102856102a1366004611686565b610714565b3480156102b1575f80fd5b505f546101d290600160a01b900460ff1681565b6102d86102d336600461162c565b610724565b6040516101de91906116c0565b3480156102f0575f80fd5b506102fa61271081565b6040519081526020016101de565b348015610313575f80fd5b50610285610783565b348015610327575f80fd5b50610285610336366004611686565b610919565b348015610346575f80fd5b506003546102fa565b34801561035a575f80fd5b50610285610369366004611747565b61093e565b348015610379575f80fd5b5061024e61038836600461162c565b6109b2565b348015610398575f80fd5b506102226109e6565b3480156103ac575f80fd5b506102fa6103bb366004611786565b610a76565b3480156103cb575f80fd5b505f5461024e906001600160a01b031681565b3480156103e9575f80fd5b506102226040518060400160405280600681526020016553504f4f4b5960d01b81525081565b34801561041a575f80fd5b506102856104293660046117ae565b610ab8565b348015610439575f80fd5b506004546102fa565b6102d861045036600461162c565b610b23565b348015610460575f80fd5b5061028561046f3660046117df565b610b70565b34801561047f575f80fd5b506102fa66038d7ea4c6800081565b348015610499575f80fd5b506102226104a836600461162c565b610bc3565b3480156104b8575f80fd5b506102fa655af3107a400081565b3480156104d1575f80fd5b506101d26104e0366004611849565b6001600160a01b039182165f90815260096020908152604080832093909416825291909152205460ff1690565b348015610518575f80fd5b50610285610527366004611786565b610c2b565b348015610537575f80fd5b506102fa600a81565b34801561054b575f80fd5b5061028561055a366004611871565b610cd3565b5f6301ffc9a760e01b6001600160e01b03198316148061058f57506380ac58cd60e01b6001600160e01b03198316145b806105aa5750635b5e139f60e01b6001600160e01b03198316145b92915050565b5f818152600660205260408120546001600160a01b03166105ec5760405162461bcd60e51b81526004016105e39061188a565b60405180910390fd5b505f908152600860205260409020546001600160a01b031690565b5f818152600660205260409020546001600160a01b03168061063b5760405162461bcd60e51b81526004016105e39061188a565b336001600160a01b038216148061067457506001600160a01b0381165f90815260096020908152604080832033845290915290205460ff165b6106b95760405162461bcd60e51b815260206004820152601660248201527514d413d3d2d64e881b9bdd08185d5d1a1bdc9a5e995960521b60448201526064016105e3565b5f8281526008602052604080822080546001600160a01b0319166001600160a01b0387811691821790925591518593918516917f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b92591a4505050565b61071f838383610d53565b505050565b600a5460609060ff161561074a5760405162461bcd60e51b81526004016105e3906118c1565b600a805460ff191660011790556107738261076c8166038d7ea4c68000611900565b6001610f46565b600a805460ff1916905592915050565b5f546001600160a01b031633146107ac5760405162461bcd60e51b81526004016105e390611917565b600a5460ff16156107cf5760405162461bcd60e51b81526004016105e3906118c1565b600a805460ff19166001179055478061082a5760405162461bcd60e51b815260206004820152601b60248201527f53504f4f4b593a206e6f7468696e6720746f207769746864726177000000000060448201526064016105e3565b5f80546040516001600160a01b039091169083908381818185875af1925050503d805f8114610874576040519150601f19603f3d011682016040523d82523d5f602084013e610879565b606091505b50509050806108ca5760405162461bcd60e51b815260206004820152601760248201527f53504f4f4b593a207769746864726177206661696c656400000000000000000060448201526064016105e3565b5f546040518381526001600160a01b03909116907f7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b659060200160405180910390a25050600a805460ff19169055565b610924838383610d53565b61071f83838360405180602001604052805f815250611216565b5f546001600160a01b031633146109675760405162461bcd60e51b81526004016105e390611917565b60016109748284836119d2565b507f5411e8ebf1636d9e83d5fc4900bf80cbac82e8790da2a4c94db4895e889eedf682826040516109a6929190611a8c565b60405180910390a15050565b5f818152600660205260408120546001600160a01b0316806105aa5760405162461bcd60e51b81526004016105e39061188a565b6060600180546109f590611956565b80601f0160208091040260200160405190810160405280929190818152602001828054610a2190611956565b8015610a6c5780601f10610a4357610100808354040283529160200191610a6c565b820191905f5260205f20905b815481529060010190602001808311610a4f57829003601f168201915b5050505050905090565b5f6001600160a01b038216610a9d5760405162461bcd60e51b81526004016105e390611aba565b506001600160a01b03165f9081526007602052604090205490565b335f8181526009602090815260408083206001600160a01b03871680855290835292819020805460ff191686151590811790915590519081529192917f17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31910160405180910390a35050565b600a5460609060ff1615610b495760405162461bcd60e51b81526004016105e3906118c1565b600a805460ff1916600117905561077382610b6a81655af3107a4000611900565b5f610f46565b610b7b858585610d53565b610bbc85858585858080601f0160208091040260200160405190810160405280939291908181526020018383808284375f9201919091525061121692505050565b5050505050565b5f818152600660205260409020546060906001600160a01b0316610bf95760405162461bcd60e51b81526004016105e39061188a565b6001610c048361133c565b604051602001610c15929190611ae8565b6040516020818303038152906040529050919050565b5f546001600160a01b03163314610c545760405162461bcd60e51b81526004016105e390611917565b6001600160a01b038116610c7a5760405162461bcd60e51b81526004016105e390611aba565b5f80546040516001600160a01b03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a35f80546001600160a01b0319166001600160a01b0392909216919091179055565b5f546001600160a01b03163314610cfc5760405162461bcd60e51b81526004016105e390611917565b5f8054821515600160a01b0260ff60a01b199091161790556040517fa9f739ee29a6336acdfe5b044a6dce0d70579031be6dbdece2ac0848d8c2a08090610d4890831515815260200190565b60405180910390a150565b5f818152600660205260409020546001600160a01b039081169084168114610db25760405162461bcd60e51b815260206004820152601260248201527153504f4f4b593a2077726f6e672066726f6d60701b60448201526064016105e3565b6001600160a01b038316610dd85760405162461bcd60e51b81526004016105e390611aba565b336001600160a01b0385161480610e0457505f828152600860205260409020546001600160a01b031633145b80610e3157506001600160a01b0384165f90815260096020908152604080832033845290915290205460ff165b610e765760405162461bcd60e51b815260206004820152601660248201527514d413d3d2d64e881b9bdd08185d5d1a1bdc9a5e995960521b60448201526064016105e3565b5f82815260086020908152604080832080546001600160a01b03191690556001600160a01b038716835260079091528120805460019290610eb8908490611b73565b90915550506001600160a01b0383165f908152600760205260408120805460019290610ee5908490611b86565b90915550505f8281526006602052604080822080546001600160a01b0319166001600160a01b0387811691821790925591518593918816917fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef91a450505050565b5f54606090600160a01b900460ff16610f995760405162461bcd60e51b815260206004820152601560248201527429a827a7a5ac9d1036b4b73a103737ba1037b832b760591b60448201526064016105e3565b5f84118015610fa95750600a8411155b610fe85760405162461bcd60e51b815260206004820152601060248201526f053504f4f4b593a2071747920312d31360841b60448201526064016105e3565b8234148261102b576040518060400160405280601b81526020017f53504f4f4b593a2073656e642065786163742066726565206665650000000000815250611062565b6040518060400160405280601d81526020017f53504f4f4b593a2073656e6420657861637420706169642070726963650000008152505b906110805760405162461bcd60e51b81526004016105e3919061161a565b508360035410156110c85760405162461bcd60e51b815260206004820152601260248201527153504f4f4b593a20706f6f6c20656d70747960701b60448201526064016105e3565b8367ffffffffffffffff8111156110e1576110e1611942565b60405190808252806020026020018201604052801561110a578160200160208202803683370190505b5090505f5b8481101561120e575f611120611441565b90508083838151811061113557611135611b99565b6020908102919091018101919091525f82815260068252604080822080546001600160a01b031916339081179091558252600790925290812080546001929061117f908490611b86565b9091555050604051819033905f907fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef908290a46040518415158152819033907f2e39da64f16aee70f5bde107d35193dc6d39685fd8e4132c5c8cc3c0354592de9060200160405180910390a36112055f338360405180602001604052805f815250611216565b5060010161110f565b509392505050565b6001600160a01b0383163b1561133657604051630a85bd0160e11b81526001600160a01b0384169063150b7a0290611258903390889087908790600401611bad565b6020604051808303815f875af1925050508015611292575060408051601f3d908101601f1916820190925261128f91810190611be9565b60015b6112da5760405162461bcd60e51b815260206004820152601960248201527814d413d3d2d64e881c9958d95a5d995c881c995a9958dd1959603a1b60448201526064016105e3565b6001600160e01b03198116630a85bd0160e11b14610bbc5760405162461bcd60e51b815260206004820152601960248201527814d413d3d2d64e881c9958d95a5d995c881c995a9958dd1959603a1b60448201526064016105e3565b50505050565b6060815f036113625750506040805180820190915260018152600360fc1b602082015290565b815f5b811561138b578061137581611c04565b91506113849050600a83611c30565b9150611365565b5f8167ffffffffffffffff8111156113a5576113a5611942565b6040519080825280601f01601f1916602001820160405280156113cf576020820181803683370190505b5090505b8415611439576113e4600183611b73565b91506113f1600a86611c43565b6113fc906030611b86565b60f81b81838151811061141157611411611b99565b60200101906001600160f81b03191690815f1a905350611432600a86611c30565b94506113d3565b949350505050565b6003545f90816114508261150e565b5f8181526002602052604090205490915015611479575f81815260026020526040902054611484565b611484816001611b86565b92505f600281611495600186611b73565b81526020019081526020015f20545f146114ca5760025f6114b7600186611b73565b81526020019081526020015f20546114cc565b825b5f83815260026020526040902081905590506114e9600184611b73565b600381905550600160045f8282546115019190611b86565b9250508190555050505090565b5f600160055f8282546115219190611b86565b909155505f905044611534600143611b73565b600554604080516020810194909452914091830191909152426060808401919091524360808401526bffffffffffffffffffffffff1933821b811660a08501523090911b1660b483015260c882015260e881018490526101080160408051601f19818403018152919052805160209091012090506115b28382611c43565b9392505050565b6001600160e01b0319811681146115ce575f80fd5b50565b5f602082840312156115e1575f80fd5b81356115b2816115b9565b5f81518084528060208401602086015e5f602082860101526020601f19601f83011685010191505092915050565b602081525f6115b260208301846115ec565b5f6020828403121561163c575f80fd5b5035919050565b80356001600160a01b0381168114611659575f80fd5b919050565b5f806040838503121561166f575f80fd5b61167883611643565b946020939093013593505050565b5f805f60608486031215611698575f80fd5b6116a184611643565b92506116af60208501611643565b929592945050506040919091013590565b602080825282518282018190525f918401906040840190835b818110156116f75783518352602093840193909201916001016116d9565b509095945050505050565b5f8083601f840112611712575f80fd5b50813567ffffffffffffffff811115611729575f80fd5b602083019150836020828501011115611740575f80fd5b9250929050565b5f8060208385031215611758575f80fd5b823567ffffffffffffffff81111561176e575f80fd5b61177a85828601611702565b90969095509350505050565b5f60208284031215611796575f80fd5b6115b282611643565b80358015158114611659575f80fd5b5f80604083850312156117bf575f80fd5b6117c883611643565b91506117d66020840161179f565b90509250929050565b5f805f805f608086880312156117f3575f80fd5b6117fc86611643565b945061180a60208701611643565b935060408601359250606086013567ffffffffffffffff81111561182c575f80fd5b61183888828901611702565b969995985093965092949392505050565b5f806040838503121561185a575f80fd5b61186383611643565b91506117d660208401611643565b5f60208284031215611881575f80fd5b6115b28261179f565b60208082526018908201527f53504f4f4b593a20746f6b656e206e6f74206d696e7465640000000000000000604082015260600190565b60208082526011908201527014d413d3d2d64e881c99595b9d1c985b9d607a1b604082015260600190565b634e487b7160e01b5f52601160045260245ffd5b80820281158282048414176105aa576105aa6118ec565b60208082526011908201527029a827a7a5ac9d103737ba1037bbb732b960791b604082015260600190565b634e487b7160e01b5f52604160045260245ffd5b600181811c9082168061196a57607f821691505b60208210810361198857634e487b7160e01b5f52602260045260245ffd5b50919050565b601f82111561071f57805f5260205f20601f840160051c810160208510156119b35750805b601f840160051c820191505b81811015610bbc575f81556001016119bf565b67ffffffffffffffff8311156119ea576119ea611942565b6119fe836119f88354611956565b8361198e565b5f601f841160018114611a2f575f8515611a185750838201355b5f19600387901b1c1916600186901b178355610bbc565b5f83815260208120601f198716915b82811015611a5e5786850135825560209485019460019092019101611a3e565b5086821015611a7a575f1960f88860031b161c19848701351681555b505060018560011b0183555050505050565b60208152816020820152818360408301375f818301604090810191909152601f909201601f19160101919050565b60208082526014908201527353504f4f4b593a207a65726f206164647265737360601b604082015260600190565b5f808454611af581611956565b600182168015611b0c5760018114611b2157611b4e565b60ff1983168652811515820286019350611b4e565b875f5260205f205f5b83811015611b4657815488820152600190910190602001611b2a565b505081860193505b50505083518060208601835e64173539b7b760d91b9101908152600501949350505050565b818103818111156105aa576105aa6118ec565b808201808211156105aa576105aa6118ec565b634e487b7160e01b5f52603260045260245ffd5b6001600160a01b03858116825284166020820152604081018390526080606082018190525f90611bdf908301846115ec565b9695505050505050565b5f60208284031215611bf9575f80fd5b81516115b2816115b9565b5f60018201611c1557611c156118ec565b5060010190565b634e487b7160e01b5f52601260045260245ffd5b5f82611c3e57611c3e611c1c565b500490565b5f82611c5157611c51611c1c565b50069056fea2646970667358221220f5f99273a35313e43eddc7aff3d76cccba1f386e7441f25eabb6a5086925d4f764736f6c634300081a0033";
 const ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner_","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner_","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"string","name":"baseURI","type":"string"}],"name":"BaseURIChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bool","name":"open","type":"bool"}],"name":"MintOpenChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"minter","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"bool","name":"paid","type":"bool"}],"name":"SpookyMinted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Withdrawal","type":"event"},{"inputs":[],"name":"FREE_FEE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_PER_TX","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_SUPPLY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"PAID_PRICE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"baseURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"qty","type":"uint256"}],"name":"mintFree","outputs":[{"internalType":"uint256[]","name":"tokenIds","type":"uint256[]"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"mintOpen","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"qty","type":"uint256"}],"name":"mintPaid","outputs":[{"internalType":"uint256[]","name":"tokenIds","type":"uint256[]"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"remaining","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"baseURI_","type":"string"}],"name":"setBaseURI","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bool","name":"open_","type":"bool"}],"name":"setMintOpen","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalMinted","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+
 const CHAINS = {
-  56: {name:"BNB Chain (Mainnet)", hex:"0x38", scan:"https://bscscan.com", rpc:"https://bsc-dataseed.binance.org", currency:"BNB"},
-  97: {name:"BNB Testnet", hex:"0x61", scan:"https://testnet.bscscan.com", rpc:"https://data-seed-prebsc-1-s1.binance.org:8545", currency:"tBNB"}
+  56: { name: "BNB Chain — Mainnet", hex: "0x38", scan: "https://bscscan.com", rpc: "https://bsc-dataseed.binance.org", cur: "BNB" },
+  97: { name: "BNB Chain — Testnet", hex: "0x61", scan: "https://testnet.bscscan.com", rpc: "https://data-seed-prebsc-1-s1.binance.org:8545", cur: "tBNB" }
 };
-let provider, signer, account, chainId, contract = null;
+const LIVE_ADDR = "0xC75B0003AC4A5FfaE3feb37278a03d503f344C3f";
 
-const $ = id => document.getElementById(id);
-function log(msg){
-  const t = new Date().toLocaleTimeString("en-GB");
-  $("log").textContent += "["+t+"] "+msg+"\n";
-  $("log").scrollTop = $("log").scrollHeight;
+const T = {
+en: {
+  docTitle: "Spooky Halloween · Deploy & Manage Contract — Owner Tool",
+  title: "DEPLOY &amp; MANAGE <span>CONTRACT</span>",
+  intro: "Owner tool for the Spooky Halloween contract — ERC-721, BNB Chain, 10,000 pixel NFTs in one shared pool. Every action on this page is signed by your own wallet.",
+  warn: "🔐 <b>Owner tool.</b> Your wallet signs everything; keys never leave your wallet. The contract is unaudited — test on BNB Testnet first if in doubt. <b>Mint is NOT opened automatically after deploy</b> — it always starts <b>CLOSED</b> and only opens when the owner signs the “Open Mint” transaction in step 5.",
+  s1t: "Network & Wallet", connect: "Connect Wallet",
+  s2t: "Deploy the SpookyHalloween Contract",
+  s2p: "Name: <b>Spooky Halloween</b> · Symbol: <b>SPOOKY</b> · Max supply: <b>10,000</b> · Free mint: <b>0.0001 BNB fee</b> · Paid mint: <b>0.001 BNB</b> · Max <b>10</b> per transaction · Free &amp; paid draw from <b>one shared pool</b>. No constructor arguments. After a successful deploy, the contract address fills in automatically in step 3.",
+  s2note: "Remember: deploying does not open mint and does not set the base URI. Both are separate steps the owner signs themselves (steps 4 & 5).",
+  deploy: "Deploy Contract",
+  s3t: "Contract Address", load: "Load Status",
+  s4t: "Metadata Base URI (owner signature)",
+  s4p: "tokenURI of every NFT = base URI + token id + “.json”, e.g. <span class=\"mono\" style=\"color:var(--text)\">https://spoxydev.fun/metadata/1.json</span> — the metadata files are already live on your own domain, and the live contract’s base URI is already set to this value.",
+  setUri: "Set Base URI",
+  s5t: "Mint (owner signature)", mintStatusLabel: "Mint status:",
+  s5p: "Mint status only changes when the owner signs this transaction. “Open Mint” asks for one more confirmation before it is sent to your wallet.",
+  openMint: "Open Mint", closeMint: "Close Mint",
+  s6t: "Withdraw Funds (owner signature)", balLabel: "Contract balance:", withdraw: "Withdraw to Owner",
+  foot: "SPOOKYWEEN · OWNER TOOL ·", back: "← Back to the mint page",
+  noWallet: "No browser wallet found. Install MetaMask / Binance Wallet first.",
+  connected: "Connected", chain: "Chain", walletBalance: "Wallet balance",
+  wrongChain: (want) => "Your wallet is on a different chain. Switch to " + want + " — the page requested a switch; approve it in your wallet, or switch manually.",
+  connectFirst: "Connect your wallet first (step 1).",
+  deploying: "Deploying… confirm the transaction in your wallet.",
+  deployed: "Deploy successful! Contract address:", viewTx: "View transaction",
+  deployFailed: "Deploy failed:",
+  addrFirst: "Paste a contract address in step 3 first.",
+  loading: "Loading contract status…",
+  cOwner: "Owner", cMint: "Mint", cMinted: "Minted total", cBase: "Base URI", cBalance: "Contract balance",
+  open: "OPEN", closed: "CLOSED", notSet: "(not set)",
+  youOwner: "✓ The connected wallet is the contract owner.",
+  youNotOwner: "✗ The connected wallet is NOT the owner — owner-only actions will fail.",
+  loadFailed: "Could not load that address on this network:",
+  sending: "Sending… confirm in your wallet.", done: "Done ✓", failed: "Failed:",
+  uriSending: "Setting the base URI… confirm in your wallet.",
+  confirmOpen: "Open mint for everyone? Anyone can mint Spooky Halloween NFTs (free mint 0.0001 BNB fee, paid mint 0.001 BNB).",
+  confirmClose: "Close mint? Nobody can mint until it is reopened.",
+  confirmWithdraw: "Withdraw the full contract balance to the owner wallet?"
+},
+zh: {
+  docTitle: "Spooky Halloween · 部署与管理合约 — 所有者工具",
+  title: "部署与管理<span>合约</span>",
+  intro: "Spooky Halloween 合约的所有者工具 —— ERC-721、BNB 链、一个共享池中的 10,000 个像素 NFT。本页面的每个操作都由你自己的钱包签名。",
+  warn: "🔐 <b>所有者工具。</b>所有操作都由你的钱包签名；密钥永不离开你的钱包。本合约未经审计 —— 如有疑虑，请先在 BNB 测试网测试。<b>部署后不会自动开启铸造</b> —— 铸造始终从<b>关闭</b>状态开始，只有所有者在第 5 步签署“开启铸造”交易后才会开启。",
+  s1t: "网络与钱包", connect: "连接钱包",
+  s2t: "部署 SpookyHalloween 合约",
+  s2p: "名称：<b>Spooky Halloween</b> · 符号：<b>SPOOKY</b> · 最大供应量：<b>10,000</b> · 免费铸造：<b>0.0001 BNB 手续费</b> · 付费铸造：<b>0.001 BNB</b> · 每笔交易最多 <b>10 个</b> · 免费与付费从<b>同一个共享池</b>抽取。无构造参数。部署成功后，合约地址会自动填入第 3 步。",
+  s2note: "请注意：部署不会开启铸造，也不会设置基础 URI。这两项都是所有者本人签署的独立步骤（第 4 步和第 5 步）。",
+  deploy: "部署合约",
+  s3t: "合约地址", load: "加载状态",
+  s4t: "元数据基础 URI（所有者签名）",
+  s4p: "每个 NFT 的 tokenURI = 基础 URI + 代币编号 + “.json”，例如 <span class=\"mono\" style=\"color:var(--text)\">https://spoxydev.fun/metadata/1.json</span> —— 元数据文件已上线并通过你自己的域名提供；线上合约的基础 URI 已经设置为此值。",
+  setUri: "设置基础 URI",
+  s5t: "铸造（所有者签名）", mintStatusLabel: "铸造状态：",
+  s5p: "铸造状态只有在所有者签署此交易后才会改变。“开启铸造”在发送到你的钱包前会再确认一次。",
+  openMint: "开启铸造", closeMint: "关闭铸造",
+  s6t: "提取资金（所有者签名）", balLabel: "合约余额：", withdraw: "提取到所有者钱包",
+  foot: "SPOOKYWEEN · 所有者工具 ·", back: "← 返回铸造页面",
+  noWallet: "未找到浏览器钱包。请先安装 MetaMask / Binance Wallet。",
+  connected: "已连接", chain: "链", walletBalance: "钱包余额",
+  wrongChain: (want) => "你的钱包在另一条链上。请切换到 " + want + " —— 页面已请求钱包切换，请在钱包中批准，或手动切换。",
+  connectFirst: "请先连接钱包（第 1 步）。",
+  deploying: "正在部署……请在钱包中确认交易。",
+  deployed: "部署成功！合约地址：", viewTx: "查看交易",
+  deployFailed: "部署失败：",
+  addrFirst: "请先在第 3 步粘贴合约地址。",
+  loading: "正在加载合约状态……",
+  cOwner: "所有者", cMint: "铸造", cMinted: "已铸造总数", cBase: "基础 URI", cBalance: "合约余额",
+  open: "已开启", closed: "已关闭", notSet: "（未设置）",
+  youOwner: "✓ 当前连接的钱包就是合约所有者。",
+  youNotOwner: "✗ 当前连接的钱包不是所有者 —— 仅限所有者的操作将会失败。",
+  loadFailed: "无法在此网络加载该地址：",
+  sending: "正在发送……请在钱包中确认。", done: "完成 ✓", failed: "失败：",
+  uriSending: "正在设置基础 URI……请在钱包中确认。",
+  confirmOpen: "为所有人开启铸造？任何人都可以铸造 Spooky Halloween NFT（免费铸造 0.0001 BNB 手续费，付费铸造 0.001 BNB）。",
+  confirmClose: "关闭铸造？重新开启之前，任何人无法铸造。",
+  confirmWithdraw: "将合约全部余额提取到所有者钱包？"
+} };
+
+let lang = localStorage.getItem("spooky-deploy-lang") || "en";
+let provider = null, signer = null, account = null, walletChain = null;
+
+const $ = (id) => document.getElementById(id);
+function t(k) { return T[lang][k]; }
+function setStatus(id, msg, cls) {
+  const el = $(id);
+  el.textContent = msg;
+  el.className = "status" + (cls ? " " + cls : "");
 }
-function short(a){ return a ? a.slice(0,6)+"…"+a.slice(-4) : "—"; }
-function scanBase(){ return (CHAINS[chainId]||CHAINS[56]).scan; }
+function scanBase() { const c = CHAINS[walletChain] || CHAINS[Number($("networkSel").value)] || CHAINS[56]; return c.scan; }
+function selChain() { return Number($("networkSel").value); }
 
-async function connect(){
-  if(!window.ethereum){ log("❌ No Web3 wallet found. Open this page from a wallet browser (MetaMask/Trust Wallet/Binance Wallet) or install the MetaMask extension."); return; }
-  provider = new ethers.providers.Web3Provider(window.ethereum);
-  await provider.send("eth_requestAccounts", []);
-  signer = provider.getSigner();
-  account = await signer.getAddress();
-  const net = await provider.getNetwork();
-  chainId = net.chainId;
-  const bal = await provider.getBalance(account);
-  $("walletInfo").textContent = "Connected: "+account+" · Network: "+(CHAINS[chainId]?CHAINS[chainId].name:"ID "+chainId+" (not a BNB Chain!)")+" · Balance: "+ethers.utils.formatEther(bal)+" BNB";
-  $("btnDeploy").disabled = false;
-  log("Wallet connected: "+account+" on chain "+chainId);
-  const saved = localStorage.getItem("spooky-contract-"+chainId);
-  if(saved && !$("inpAddr").value){ $("inpAddr").value = saved; loadContract(); }
-  window.ethereum.on("accountsChanged", ()=>location.reload());
-  window.ethereum.on("chainChanged", ()=>location.reload());
+function setLang(l) {
+  lang = l;
+  localStorage.setItem("spooky-deploy-lang", l);
+  document.documentElement.lang = l === "zh" ? "zh" : "en";
+  document.title = T[l].docTitle;
+  $("langEn").classList.toggle("on", l === "en");
+  $("langZh").classList.toggle("on", l === "zh");
+  document.querySelectorAll("[data-i18n]").forEach((el) => { const k = el.getAttribute("data-i18n"); if (T[l][k]) el.textContent = T[l][k]; });
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => { const k = el.getAttribute("data-i18n-html"); if (T[l][k]) el.innerHTML = T[l][k]; });
 }
 
-async function ensureChain(target){
-  if(!window.ethereum){ log("❌ Connect your wallet first."); return; }
-  const c = CHAINS[target];
-  try{ await window.ethereum.request({method:"wallet_switchEthereumChain", params:[{chainId:c.hex}]}); }
-  catch(e){
-    if(e.code === 4902){
-      await window.ethereum.request({method:"wallet_addEthereumChain", params:[{chainId:c.hex, chainName:c.name, rpcUrls:[c.rpc], nativeCurrency:{name:c.currency, symbol:c.currency, decimals:18}, blockExplorerUrls:[c.scan]}]});
-    } else { log(❌ Failed to switch network: "+e.message); return; }
+async function connectWallet() {
+  if (!window.ethereum) { setStatus("walletStatus", "✗ " + t("noWallet"), "err"); return; }
+  try {
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    signer = provider.getSigner();
+    account = await signer.getAddress();
+    const net = await provider.getNetwork();
+    walletChain = net.chainId;
+    const want = selChain();
+    if (walletChain !== want) {
+      setStatus("walletStatus", "⚠ " + t("wrongChain")(CHAINS[want].name), "err");
+      try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: CHAINS[want].hex }] }); } catch (e) {}
+      return;
+    }
+    const bal = await provider.getBalance(account);
+    setStatus("walletStatus", "✓ " + t("connected") + ": " + account + "\n" + t("chain") + ": " + CHAINS[walletChain].name + " (" + walletChain + ") · " + t("walletBalance") + ": " + ethers.utils.formatEther(bal) + " BNB", "ok");
+    if ($("contractAddr").value.trim()) loadStatus();
+  } catch (e) { setStatus("walletStatus", "✗ " + (e.message || e), "err"); }
+}
+
+async function onNetworkChange() {
+  const saved = localStorage.getItem("spooky-contract-" + selChain());
+  $("contractAddr").value = saved || (selChain() === 56 ? LIVE_ADDR : "");
+  if (window.ethereum && provider) {
+    try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: CHAINS[selChain()].hex }] }); } catch (e) {}
   }
-  if(!provider) await connect(); else location.reload();
 }
 
-async function deploy(){
-  if(!signer){ log("❌ Connect your wallet first."); return; }
-  if(chainId !== 56 && chainId !== 97){ log("❌ The current network is not BNB Chain/Testnet. Switch networks in step 1 first."); return; }
-  try{
-    $("btnDeploy").disabled = true;
-    log("Building the deploy transaction… sign it in your wallet.");
+function readContract() {
+  const addr = $("contractAddr").value.trim();
+  if (!ethers.utils.isAddress(addr)) return null;
+  const p = signer || provider || new ethers.providers.JsonRpcProvider(CHAINS[selChain()].rpc);
+  return new ethers.Contract(addr, ABI, p);
+}
+function writeContract() {
+  const addr = $("contractAddr").value.trim();
+  if (!ethers.utils.isAddress(addr)) return null;
+  return new ethers.Contract(addr, ABI, signer);
+}
+
+async function loadStatus() {
+  const addr = $("contractAddr").value.trim();
+  if (!ethers.utils.isAddress(addr)) { setStatus("contractStatus", "✗ " + t("addrFirst"), "err"); return; }
+  if (!provider && !window.ethereum) { provider = new ethers.providers.JsonRpcProvider(CHAINS[selChain()].rpc); }
+  setStatus("contractStatus", t("loading"));
+  try {
+    const c = readContract();
+    const p = signer || provider || new ethers.providers.JsonRpcProvider(CHAINS[selChain()].rpc);
+    const [owner, open, base, minted, bal] = await Promise.all([
+      c.owner(), c.mintOpen(), c.baseURI(), c.totalMinted(), p.getBalance(addr)
+    ]);
+    localStorage.setItem("spooky-contract-" + selChain(), addr);
+    let lines = t("cOwner") + ": " + owner + "\n" +
+      t("cMint") + ": " + (open ? t("open") : t("closed")) + "\n" +
+      t("cMinted") + ": " + minted.toString() + " / 10,000\n" +
+      t("cBase") + ": " + (base || t("notSet")) + "\n" +
+      t("cBalance") + ": " + ethers.utils.formatEther(bal) + " BNB";
+    if (account) lines += "\n" + (owner.toLowerCase() === account.toLowerCase() ? t("youOwner") : t("youNotOwner"));
+    setStatus("contractStatus", lines, "ok");
+    const ms = $("mintStatusText");
+    ms.textContent = open ? t("open") : t("closed");
+    ms.className = open ? "open" : "closed";
+    $("balanceText").textContent = ethers.utils.formatEther(bal) + " BNB";
+  } catch (e) { setStatus("contractStatus", "✗ " + t("loadFailed") + " " + (e.message || e), "err"); }
+}
+
+async function deployContract() {
+  if (!signer) { setStatus("deployStatus", "✗ " + t("connectFirst"), "err"); return; }
+  if (walletChain !== selChain()) { setStatus("deployStatus", "✗ " + t("wrongChain")(CHAINS[selChain()].name), "err"); return; }
+  try {
+    $("deployBtn").disabled = true;
+    setStatus("deployStatus", t("deploying"));
     const factory = new ethers.ContractFactory(ABI, BYTECODE, signer);
     const c = await factory.deploy();
-    $("deployInfo").innerHTML = "Transaction sent: <a target='_blank' rel='noopener' href='"+scanBase()+"/tx/"+c.deployTransaction.hash+"'>"+short(c.deployTransaction.hash)+"</a> — waiting for confirmation…";
-    log("Tx deploy: "+c.deployTransaction.hash);
+    $("deployStatus").innerHTML = "";
+    $("deployStatus").appendChild(document.createTextNode(t("deploying") + "\nTx: "));
+    const a = document.createElement("a");
+    a.href = scanBase() + "/tx/" + c.deployTransaction.hash; a.target = "_blank"; a.rel = "noopener"; a.textContent = c.deployTransaction.hash;
+    $("deployStatus").appendChild(a);
     await c.deployed();
-    contract = c;
-    $("inpAddr").value = c.address;
-    localStorage.setItem("spooky-contract-"+chainId, c.address);
-    $("deployInfo").innerHTML = "✅ Contract deployed at: <b>"+c.address+"</b><br><a target='_blank' rel='noopener' href='"+scanBase()+"/address/"+c.address+"'>View on BscScan ↗</a>";
-    log("✅ Deploy succeeded: "+c.address+" — mint is still CLOSED. Continue to step 4 (base URI) when ready.");
-    refreshStatus();
-  }catch(e){ log("❌ Deploy failed/cancelled: "+(e.message||e)); }
-  $("btnDeploy").disabled = false;
+    $("contractAddr").value = c.address;
+    localStorage.setItem("spooky-contract-" + walletChain, c.address);
+    $("deployStatus").innerHTML = "";
+    $("deployStatus").className = "status ok";
+    $("deployStatus").appendChild(document.createTextNode("✓ " + t("deployed") + " " + c.address + " · "));
+    const a2 = document.createElement("a");
+    a2.href = scanBase() + "/address/" + c.address; a2.target = "_blank"; a2.rel = "noopener"; a2.textContent = t("viewTx");
+    $("deployStatus").appendChild(a2);
+    loadStatus();
+  } catch (e) { setStatus("deployStatus", "✗ " + t("deployFailed") + " " + (e.message || e), "err"); }
+  $("deployBtn").disabled = false;
 }
 
-async function loadContract(){
-  const addr = $("inpAddr").value.trim();
-  if(!ethers.utils.isAddress(addr)){ log("❌ Invalid contract address."); return; }
-  if(!provider){ await connect(); if(!provider) return; }
-  contract = new ethers.Contract(addr, ABI, signer || provider);
-  localStorage.setItem("spooky-contract-"+chainId, addr);
-  log("Contract loaded: "+addr);
-  refreshStatus();
-}
-
-async function refreshStatus(){
-  if(!contract) return;
-  try{
-    const [owner, open, base, bal] = await Promise.all([
-      contract.owner(), contract.mintOpen(), contract.baseURI(), provider.getBalance(contract.address)
-    ]);
-    const isOwner = account && owner.toLowerCase() === account.toLowerCase();
-    $("statusInfo").innerHTML =
-      "Owner: "+owner+(isOwner?" (this is your wallet ✅)":" (not the connected wallet ⚠️)")+"<br>"+
-      "Base URI: "+(base||"(not set)")+"<br>Contract balance: "+ethers.utils.formatEther(bal)+" BNB";
-    const badge = $("mintBadge");
-    badge.textContent = open ? "OPEN" : "CLOSED";
-    badge.className = "badge " + (open ? "b-open" : "b-closed");
-    $("balInfo").textContent = "Contract balance: "+ethers.utils.formatEther(bal)+" BNB";
-    const lnk = $("lnkScan");
-    lnk.href = scanBase()+"/address/"+contract.address; lnk.classList.remove("hidden");
-    const canAct = !!signer && isOwner;
-    $("btnBase").disabled = !canAct; $("btnOpen").disabled = !canAct || open;
-    $("btnClose").disabled = !canAct || !open; $("btnWithdraw").disabled = !canAct;
-    if(signer && !isOwner) log("⚠️ The connected wallet is not the contract owner — owner buttons are disabled.");
-  }catch(e){ log("❌ Failed to read status: "+(e.message||e)); }
-}
-
-async function setBase(){
-  const v = $("inpBase").value.trim();
-  if(!v) return;
-  try{
-    log("Sending setBaseURI(\""+v+"\") — sign it in your wallet.");
-    const tx = await contract.setBaseURI(v);
+async function setBaseURI() {
+  if (!signer) { setStatus("uriStatus", "✗ " + t("connectFirst"), "err"); return; }
+  const c = writeContract();
+  if (!c) { setStatus("uriStatus", "✗ " + t("addrFirst"), "err"); return; }
+  try {
+    setStatus("uriStatus", t("uriSending"));
+    const tx = await c.setBaseURI($("baseUriInput").value.trim());
     await tx.wait();
-    log("✅ Base URI set: "+v);
-    refreshStatus();
-  }catch(e){ log("❌ setBaseURI failed/cancelled: "+(e.message||e)); }
+    setStatus("uriStatus", "✓ " + t("done"), "ok");
+    loadStatus();
+  } catch (e) { setStatus("uriStatus", "✗ " + t("failed") + " " + (e.message || e), "err"); }
 }
 
-async function setMint(open){
-  if(open && !confirm("Open mint to the public? This transaction is signed by the owner and immediately enables minting on the site. Make sure the base URI is correct.")) { log("Open mint cancelled by owner."); return; }
-  try{
-    log("Sending setMintOpen("+open+") — sign it in your wallet.");
-    const tx = await contract.setMintOpen(open);
+async function setMint(open) {
+  if (!signer) { setStatus("mintTxStatus", "✗ " + t("connectFirst"), "err"); return; }
+  const c = writeContract();
+  if (!c) { setStatus("mintTxStatus", "✗ " + t("addrFirst"), "err"); return; }
+  if (!confirm(open ? t("confirmOpen") : t("confirmClose"))) return;
+  try {
+    setStatus("mintTxStatus", t("sending"));
+    const tx = await c.setMintOpen(open);
     await tx.wait();
-    log(open ? "✅ Mint OPENED by the owner." : "✅ Mint CLOSED by the owner.");
-    refreshStatus();
-  }catch(e){ log("❌ setMintOpen failed/cancelled: "+(e.message||e)); }
+    setStatus("mintTxStatus", "✓ " + t("done"), "ok");
+    loadStatus();
+  } catch (e) { setStatus("mintTxStatus", "✗ " + t("failed") + " " + (e.message || e), "err"); }
 }
 
-async function withdraw(){
-  try{
-    log("Sending withdraw() — sign it in your wallet.");
-    const tx = await contract.withdraw();
+async function withdraw() {
+  if (!signer) { setStatus("withdrawStatus", "✗ " + t("connectFirst"), "err"); return; }
+  const c = writeContract();
+  if (!c) { setStatus("withdrawStatus", "✗ " + t("addrFirst"), "err"); return; }
+  if (!confirm(t("confirmWithdraw"))) return;
+  try {
+    setStatus("withdrawStatus", t("sending"));
+    const tx = await c.withdraw();
     await tx.wait();
-    log("✅ Funds withdrawn to the owner.");
-    refreshStatus();
-  }catch(e){ log("❌ Withdraw failed/cancelled: "+(e.message||e)); }
+    setStatus("withdrawStatus", "✓ " + t("done"), "ok");
+    loadStatus();
+  } catch (e) { setStatus("withdrawStatus", "✗ " + t("failed") + " " + (e.message || e), "err"); }
 }
 
-$("btnConnect").onclick = connect;
-$("btnMainnet").onclick = ()=>ensureChain(56);
-$("btnTestnet").onclick = ()=>ensureChain(97);
-$("btnDeploy").onclick = deploy;
-$("btnLoad").onclick = loadContract;
-$("btnCopy").onclick = ()=>{ const v=$("inpAddr").value.trim(); if(v){ navigator.clipboard.writeText(v); log("Address copied: "+v); } };
-$("btnBase").onclick = setBase;
-$("btnOpen").onclick = ()=>setMint(true);
-$("btnClose").onclick = ()=>setMint(false);
-$("btnWithdraw").onclick = withdraw;
-log("Ready. Steps: 1) Connect wallet & pick a network → 2) Deploy → 3) Check the address → 4) Set base URI → 5) Open mint ONLY when you are ready to sell.");
+if (window.ethereum) {
+  window.ethereum.on("accountsChanged", () => location.reload());
+  window.ethereum.on("chainChanged", () => location.reload());
+}
+setLang(lang === "zh" ? "zh" : "en");
 </script>
 </body>
 </html>
