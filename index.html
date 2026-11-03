@@ -670,30 +670,26 @@
     var contract = CONTRACT_ADDRESS || (lang==="zh" ? "[合约地址 — 合约上线时公布]" : "[CONTRACT ADDRESS — ANNOUNCED WHEN THE CONTRACT GOES LIVE]");
     if(lang==="zh"){
       $("promptFree").textContent =
-        "为我在 BNB Chain 上铸造 " + freeQty + " 枚 Spooky Halloween NFT —— 免费铸造。\n" +
-        "合约：" + contract + "（Spooky Halloween / SPOOKY，共 10,000 枚）\n" +
-        "费用：" + freeQty + " × 每枚 0.0001 BNB 手续费 = 总计 " + fmtBNB(0.0001*freeQty) + "，另加 gas。单笔交易最多 10 枚。\n" +
-        "代币来自与付费铸造共用的同一个共享池（#1–#10,000），编号由合约随机抽取——你不能指定编号。\n" +
-        "先预览总费用并等我确认，然后再执行。";
+        "在 BNB Chain 上为我铸造 " + freeQty + " 枚 Spooky Halloween NFT（免费铸造）。\n" +
+        "合约：" + contract + "\n" +
+        "调用 mintFree(" + freeQty + ")，发送 " + fmtBNB(0.0001*freeQty) + " 铸造手续费。代币编号由合约从共享池 #1–#10,000 随机抽取。\n" +
+        "直接执行——不需要预览。完成后把交易链接发给我。";
       $("promptPaid").textContent =
-        "为我在 BNB Chain 上铸造 " + paidQty + " 枚 Spooky Halloween NFT —— 付费铸造。\n" +
-        "合约：" + contract + "（Spooky Halloween / SPOOKY，共 10,000 枚）\n" +
-        "费用：" + paidQty + " × 每枚 0.001 BNB = 总计 " + fmtBNB(0.001*paidQty) + "，另加 gas。单笔交易最多 10 枚。\n" +
-        "代币来自与免费铸造共用的同一个共享池（#1–#10,000），编号由合约随机抽取——你不能指定编号。\n" +
-        "先预览总费用并等我确认，然后再执行。";
+        "在 BNB Chain 上为我铸造 " + paidQty + " 枚 Spooky Halloween NFT（付费铸造）。\n" +
+        "合约：" + contract + "\n" +
+        "调用 mintPaid(" + paidQty + ")，只发送 " + fmtBNB(0.001*paidQty) + "——就是全部价格，没有其他费用。代币编号由合约从共享池 #1–#10,000 随机抽取。\n" +
+        "直接执行——不需要预览。完成后把交易链接发给我。";
     } else {
       $("promptFree").textContent =
-        "Mint " + freeQty + " Spooky Halloween NFT(s) for me on BNB Chain — FREE MINT.\n" +
-        "Contract: " + contract + " (Spooky Halloween / SPOOKY, 10,000 total)\n" +
-        "Cost: " + freeQty + " × 0.0001 BNB fee = " + fmtBNB(0.0001*freeQty) + " total, plus gas. Max 10 per transaction.\n" +
-        "Tokens come from ONE shared pool (#1–#10,000) shared with the paid mint, and the contract draws my token numbers AT RANDOM — you cannot pick numbers.\n" +
-        "Preview the total first and wait for my confirmation before executing.";
+        "Mint " + freeQty + " Spooky Halloween NFT(s) for me on BNB Chain (free mint).\n" +
+        "Contract: " + contract + "\n" +
+        "Call mintFree(" + freeQty + "), send " + fmtBNB(0.0001*freeQty) + " mint fee. Token number is drawn at random by the contract from the shared pool #1–#10,000.\n" +
+        "Do it now — no preview needed. Reply with the transaction link when done.";
       $("promptPaid").textContent =
-        "Mint " + paidQty + " Spooky Halloween NFT(s) for me on BNB Chain — PAID MINT.\n" +
-        "Contract: " + contract + " (Spooky Halloween / SPOOKY, 10,000 total)\n" +
-        "Cost: " + paidQty + " × 0.001 BNB = " + fmtBNB(0.001*paidQty) + " total, plus gas. Max 10 per transaction.\n" +
-        "Tokens come from ONE shared pool (#1–#10,000) shared with the free mint, and the contract draws my token numbers AT RANDOM — you cannot pick numbers.\n" +
-        "Preview the total first and wait for my confirmation before executing.";
+        "Mint " + paidQty + " Spooky Halloween NFT(s) for me on BNB Chain (paid mint).\n" +
+        "Contract: " + contract + "\n" +
+        "Call mintPaid(" + paidQty + "), send exactly " + fmtBNB(0.001*paidQty) + " — the full price, nothing extra. Token number is drawn at random by the contract from the shared pool #1–#10,000.\n" +
+        "Do it now — no preview needed. Reply with the transaction link when done.";
     }
   }
   function renderTotals(){
