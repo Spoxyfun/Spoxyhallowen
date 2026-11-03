@@ -311,6 +311,11 @@
     .ticker .track,.bat{animation:none}
     html{scroll-behavior:auto}
   }
+.mresult{font-family:"Space Mono",monospace;font-size:13px;line-height:1.7;color:#ddd3f5;background:rgba(13,4,26,.6);border:2px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:18px;word-break:break-word}
+.mresult:empty{display:none}
+.mresult.ok{border-color:#2f7d3a;color:#a7e8b0}
+.mresult.err{border-color:#7d2f35;color:#ffb3b3}
+.mresult a{color:#a78bfa}
 </style>
 </head>
 <body>
@@ -362,7 +367,7 @@
         </div>
         <div class="statusbar">
           <span class="dot" aria-hidden="true"></span>
-          <span data-i18n="statusPreview"><strong>Preview:</strong> the contract is live on BNB Chain — mint will be opened by the owner soon. Minted 0 / 10,000 • Shared pool left 10,000</span>
+          <span id="statusBarText" data-i18n="statusPreview"><strong>Preview:</strong> the contract is live on BNB Chain — mint will be opened by the owner soon. Minted 0 / 10,000 • Shared pool left 10,000</span>
         </div>
       </div>
       <div class="hero-art">
@@ -399,16 +404,16 @@
 
       <div class="live-panel">
         <div class="live-head">
-          <span class="l"><span class="dot" aria-hidden="true"></span><span data-i18n="liveState">CONTRACT LIVE — MINT OPENS SOON</span></span>
-          <span class="r" data-i18n="liveNote">On-chain live numbers will appear here once mint opens</span>
+          <span class="l"><span class="dot" aria-hidden="true"></span><span id="liveStateText" data-i18n="liveState">CONTRACT LIVE — MINT OPENS SOON</span></span>
+          <span class="r" id="liveNoteText" data-i18n="liveNote">On-chain live numbers will appear here once mint opens</span>
         </div>
         <div class="live-nums">
-          <div class="live-num"><div class="v t">0</div><div class="k" data-i18n="liveMinted">MINTED / 10,000</div></div>
-          <div class="live-num"><div class="v g">10.000</div><div class="k" data-i18n="liveFree">SHARED POOL REMAINING / 10,000</div></div>
+          <div class="live-num"><div class="v t" id="liveMintedNum">0</div><div class="k" data-i18n="liveMinted">MINTED / 10,000</div></div>
+          <div class="live-num"><div class="v g" id="liveRemainNum">10,000</div><div class="k" data-i18n="liveFree">SHARED POOL REMAINING / 10,000</div></div>
           <div class="live-num"><div class="v o">2</div><div class="k" data-i18n="livePaid">MINT METHODS — FREE & PAID, ONE POOL</div></div>
         </div>
-        <div class="live-line" data-i18n="liveLine">Minted: 0 / 10,000 — Shared pool remaining: 10,000 / 10,000 • Free & Paid draw from the same pool</div>
-        <div class="meter" role="img" aria-label="Progress mint 0 persen"><i style="width:0%"></i></div>
+        <div class="live-line" id="liveLineText" data-i18n="liveLine">Minted: 0 / 10,000 — Shared pool remaining: 10,000 / 10,000 • Free & Paid draw from the same pool</div>
+        <div class="meter" role="img" id="liveMeter" aria-label="Mint progress 0 percent"><i id="liveMeterBar" style="width:0%"></i></div>
       </div>
 
       <div class="walletbar">
@@ -423,8 +428,8 @@
           <div class="alloc" data-i18n="allocFree">Shared pool: 10,000 NFTs — same for free & paid</div>
           <div class="price g">FREE</div>
           <p data-i18n="freeDesc">NFT price <strong>0 BNB</strong> — you only pay a <strong>0.0001 BNB fee</strong> per mint, and that fee goes to the contract as a creator fee. The token you receive is <strong>drawn at random from the unminted shared #1–#10,000 pool</strong> — the same pool the paid mint draws from — token numbers cannot be chosen.</p>
-          <div class="alloc-row"><span data-i18n="allocLabel">SHARED POOL</span><span data-i18n="freeLeft">Shared pool: 10,000 left / 10,000</span></div>
-          <div class="meter sm"><i class="g" style="width:0%"></i></div>
+          <div class="alloc-row"><span data-i18n="allocLabel">SHARED POOL</span><span id="freeLeftText" data-i18n="freeLeft">Shared pool: 10,000 left / 10,000</span></div>
+          <div class="meter sm"><i class="g" id="freeMeterBar" style="width:0%"></i></div>
           <div class="qty-row">
             <label for="freeQtyOut" data-i18n="qtyLabel">Mint amount</label>
             <div class="stepper">
@@ -434,7 +439,7 @@
             </div>
           </div>
           <div class="total-row"><span data-i18n="totalFee">Total fee</span><span class="tv" id="freeTotal">0,0001 BNB</span></div>
-          <button class="btn green" type="button" disabled data-i18n="btnSoon">Mint Not Open Yet</button>
+          <button class="btn green" type="button" id="btnMintFree" disabled>Mint Not Open Yet</button>
           <p class="fineprint" data-i18n="freeFine">The total sent to the contract is just the fee: mint amount × 0.0001 BNB. The button activates once the owner opens mint.</p>
         </article>
 
@@ -444,8 +449,8 @@
           <div class="alloc" data-i18n="allocPaid">Shared pool: 10,000 NFTs — same for free & paid</div>
           <div class="price o">0,001 BNB</div>
           <p data-i18n="paidDesc">Price per NFT <strong>0.001 BNB</strong>. Paid mint can be used any time while the shared pool lasts — no need to wait for the free mint to end — and the token you receive is <strong>drawn at random from the unminted shared #1–#10,000 pool</strong>, just like the free mint. Token numbers cannot be chosen.</p>
-          <div class="alloc-row"><span data-i18n="allocLabel2">SHARED POOL</span><span data-i18n="paidLeft">Shared pool: 10,000 left / 10,000</span></div>
-          <div class="meter sm"><i class="o" style="width:0%"></i></div>
+          <div class="alloc-row"><span data-i18n="allocLabel2">SHARED POOL</span><span id="paidLeftText" data-i18n="paidLeft">Shared pool: 10,000 left / 10,000</span></div>
+          <div class="meter sm"><i class="o" id="paidMeterBar" style="width:0%"></i></div>
           <div class="qty-row">
             <label for="paidQtyOut" data-i18n="qtyLabel2">Mint amount</label>
             <div class="stepper">
@@ -455,10 +460,12 @@
             </div>
           </div>
           <div class="total-row"><span data-i18n="totalPrice">Total price</span><span class="tv" id="paidTotal">0,001 BNB</span></div>
-          <button class="btn orange" type="button" disabled data-i18n="btnSoon2">Mint Not Open Yet</button>
+          <button class="btn orange" type="button" id="btnMintPaid" disabled>Mint Not Open Yet</button>
           <p class="fineprint" data-i18n="paidFine">Total sent to the contract: mint amount × 0.001 BNB. Make sure your BNB balance covers the price plus BNB Chain gas.</p>
         </article>
       </div>
+
+      <div class="mresult" id="mintResult" role="status" aria-live="polite"></div>
 
       <div class="shuffle-panel">
         <div class="shuffle-media"><img id="shuffleImg" src="data:image/webp;base64,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" alt="Spooky Halloween sample character from the simulated draw" /></div>
@@ -536,6 +543,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
 (function(){
   "use strict";
@@ -733,7 +741,7 @@
       if(next==="zh") b.setAttribute("aria-label", (p[1]==="-1" ? "减少" : "增加") + (p[0]==="free" ? "免费铸造" : "付费铸造") + "数量");
       else b.setAttribute("aria-label", (p[1]==="-1" ? "Decrease " : "Increase ") + (p[0]==="free" ? "free mint" : "paid mint") + " amount");
     });
-    renderGallery(); renderTotals(); validateWallet(false); renderTicker();
+    renderGallery(); renderTotals(); validateWallet(false); renderTicker(); renderLive();
   }
   $("langEn").addEventListener("click", function(){ setLang("en"); });
   $("langZh").addEventListener("click", function(){ setLang("zh"); });
@@ -860,8 +868,8 @@
     }
     if(!window.ethereum){
       toast(lang==="zh"
-        ? "未检测到钱包。请在钱包浏览器（MetaMask/OKX）中打开此页面——请注意，铸造将在所有者开启后开放。"
-        : "No wallet detected. Open this page in a wallet browser (MetaMask/OKX) — mint opens once the owner opens it.", true);
+        ? "未检测到钱包。请在钱包浏览器（MetaMask/OKX）中打开此页面。"
+        : "No wallet detected. Open this page in a wallet browser (MetaMask/OKX).", true);
       return;
     }
     try {
@@ -877,11 +885,11 @@
       $("walletDot").classList.remove("red"); $("walletDot").classList.add("grn");
       $("walletStatus").innerHTML = (lang==="zh" ? "钱包已连接： " : "Wallet connected: ") +
         "<strong>" + shortAddr(connected) + "</strong>" +
-        (lang==="zh" ? " • 已就绪 — 铸造将在所有者开启后开放。" : " • Ready — mint opens once the owner opens it.");
+        (lang==="zh" ? " • 已就绪。" : " • Ready.");
       $("connectBtn").textContent = shortAddr(connected);
       $("agentWallet").value = connected;
       validateWallet(true);
-      toast(lang==="zh" ? "钱包已连接。铸造将在所有者开启后开放。" : "Wallet connected. Mint opens once the owner opens it.");
+      toast(lang==="zh" ? "钱包已连接。" : "Wallet connected.");
     } catch(e){
       toast(lang==="zh" ? "钱包连接已取消或失败。" : "Wallet connection cancelled or failed.", true);
     }
@@ -890,6 +898,136 @@
 
   renderGallery();
   renderTotals();
+  /* ---------- live mint (on-chain) ---------- */
+  var MINT_ABI = [
+    "function mintFree(uint256 qty) payable",
+    "function mintPaid(uint256 qty) payable",
+    "function mintOpen() view returns (bool)",
+    "function totalMinted() view returns (uint256)",
+    "function remaining() view returns (uint256)",
+    "function FREE_FEE() view returns (uint256)",
+    "function PAID_PRICE() view returns (uint256)",
+    "event SpookyMinted(address indexed minter, uint256 indexed tokenId, bool paid)"
+  ];
+  var LM = {
+    en: { liveStateOpen:"LIVE — MINT IS OPEN", liveNoteLive:"Live numbers from the BNB Chain contract",
+      mintFree:"Mint Free", mintPaid:"Mint Paid", notOpen:"Mint Not Open Yet",
+      statusOpen:"<strong>Live:</strong> mint is OPEN on BNB Chain.", statusClosed:"<strong>Preview:</strong> the contract is live on BNB Chain — mint will be opened by the owner soon.",
+      mintedOf:"Minted", poolLeft:"Shared pool left",
+      sending:"Sending… confirm the transaction in your wallet.", waiting:"Transaction sent — waiting for confirmation…",
+      viewTx:"View on BscScan", success:"\u{1F389} Mint successful! You drew token ", successMulti:"\u{1F389} Mint successful! You drew tokens ",
+      cancelled:"Transaction cancelled in the wallet.", failed:"Mint failed: ", closedToast:"Mint is not open yet — the owner has not opened it.",
+      noLib:"Web3 library failed to load — check your connection and reload the page.", wrongChain:"Switch your wallet to BNB Chain (56) to mint.",
+      progress:"Mint progress " },
+    zh: { liveStateOpen:"已上线 — 铸造进行中", liveNoteLive:"来自 BNB Chain 合约的实时数据",
+      mintFree:"免费铸造", mintPaid:"付费铸造", notOpen:"铸造尚未开启",
+      statusOpen:"<strong>进行中：</strong>铸造已在 BNB Chain 开启。", statusClosed:"<strong>预览：</strong>合约已在 BNB Chain 上线——铸造将由所有者很快开启。",
+      mintedOf:"已铸造", poolLeft:"共享池剩余",
+      sending:"正在发送……请在钱包中确认。", waiting:"交易已发送——等待确认……",
+      viewTx:"在 BscScan 查看", success:"\u{1F389} 铸造成功！你抽到了代币 ", successMulti:"\u{1F389} 铸造成功！你抽到了代币 ",
+      cancelled:"交易已在钱包中取消。", failed:"铸造失败：", closedToast:"铸造尚未开启——所有者还没有开启。",
+      noLib:"Web3 库加载失败——请检查网络并刷新页面。", wrongChain:"请将钱包切换到 BNB Chain（56）再铸造。",
+      progress:"铸造进度 " }
+  };
+  function lm(k){ return (LM[lang] && LM[lang][k]) || LM.en[k]; }
+  var liveState = null, liveFee = null, livePrice = null, mintBusy = false;
+  function fmtNum(n){ return n.toLocaleString("en-US"); }
+  function readProvider(){
+    var urls = ["https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc.publicnode.com"];
+    for (var i = 0; i < urls.length; i++){ try { return new ethers.providers.JsonRpcProvider(urls[i]); } catch(e){} }
+    return null;
+  }
+  async function loadLive(){
+    if (!window.ethers || !CONTRACT_ADDRESS) { renderLive(); return; }
+    try {
+      var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, readProvider());
+      var r = await Promise.all([c.mintOpen(), c.totalMinted(), c.remaining(), c.FREE_FEE(), c.PAID_PRICE()]);
+      liveState = { open: r[0], minted: r[1].toNumber(), remaining: r[2].toNumber() };
+      liveFee = r[3]; livePrice = r[4];
+    } catch(e){ /* pertahankan state terakhir */ }
+    renderLive();
+  }
+  function renderLive(){
+    var bf = $("btnMintFree"), bp = $("btnMintPaid");
+    if (!bf || !bp) return;
+    if (!liveState){
+      bf.disabled = true; bp.disabled = true;
+      bf.textContent = lm("notOpen"); bp.textContent = lm("notOpen");
+      return;
+    }
+    var m = liveState.minted, rem = liveState.remaining;
+    $("liveMintedNum").textContent = fmtNum(m);
+    $("liveRemainNum").textContent = fmtNum(rem);
+    var pct = (m / 100).toFixed(1);
+    $("liveMeterBar").style.width = pct + "%";
+    $("freeMeterBar").style.width = pct + "%";
+    $("paidMeterBar").style.width = pct + "%";
+    $("liveMeter").setAttribute("aria-label", lm("progress") + pct + "%");
+    $("liveLineText").textContent = lang === "zh"
+      ? "已铸造：" + fmtNum(m) + " / 10,000 — 共享池剩余：" + fmtNum(rem) + " / 10,000 • 免费与付费从同一个池抽取"
+      : "Minted: " + fmtNum(m) + " / 10,000 — Shared pool remaining: " + fmtNum(rem) + " / 10,000 • Free & Paid draw from the same pool";
+    var leftTxt = lang === "zh" ? "共享池：剩余 " + fmtNum(rem) + " / 10,000" : "Shared pool: " + fmtNum(rem) + " left / 10,000";
+    $("freeLeftText").textContent = leftTxt;
+    $("paidLeftText").textContent = leftTxt;
+    if (liveState.open){
+      $("liveStateText").textContent = lm("liveStateOpen");
+      $("liveNoteText").textContent = lm("liveNoteLive");
+      $("statusBarText").innerHTML = lm("statusOpen") + " " + lm("mintedOf") + " " + fmtNum(m) + " / 10,000 • " + lm("poolLeft") + " " + fmtNum(rem);
+    } else {
+      $("liveStateText").textContent = lang === "zh" ? I18N.zh.liveState : enCache.liveState;
+      $("liveNoteText").textContent = lang === "zh" ? I18N.zh.liveNote : enCache.liveNote;
+      $("statusBarText").innerHTML = lm("statusClosed") + " " + lm("mintedOf") + " " + fmtNum(m) + " / 10,000 • " + lm("poolLeft") + " " + fmtNum(rem);
+    }
+    if (mintBusy){ bf.disabled = true; bp.disabled = true; }
+    else if (liveState.open){ bf.disabled = false; bp.disabled = false; bf.textContent = lm("mintFree"); bp.textContent = lm("mintPaid"); }
+    else { bf.disabled = true; bp.disabled = true; bf.textContent = lm("notOpen"); bp.textContent = lm("notOpen"); }
+  }
+  function setMintRes(html, cls, asText){
+    var el = $("mintResult");
+    if (asText) el.textContent = html; else el.innerHTML = html;
+    el.className = "mresult" + (cls ? " " + cls : "");
+  }
+  async function doMint(kind){
+    if (mintBusy) return;
+    if (!window.ethers){ toast(lm("noLib"), true); return; }
+    if (!liveState || !liveState.open){ toast(lm("closedToast"), true); return; }
+    if (!connected){ await connect(); if (!connected) return; }
+    var qty = kind === "free" ? freeQty : paidQty;
+    var unit = kind === "free" ? (liveFee || ethers.utils.parseEther("0.0001")) : (livePrice || ethers.utils.parseEther("0.001"));
+    mintBusy = true; renderLive();
+    try {
+      var prov = new ethers.providers.Web3Provider(window.ethereum);
+      var net = await prov.getNetwork();
+      if (net.chainId !== 56){
+        try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] }); } catch(e){}
+        prov = new ethers.providers.Web3Provider(window.ethereum);
+        net = await prov.getNetwork();
+        if (net.chainId !== 56) throw new Error(lm("wrongChain"));
+      }
+      var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, prov.getSigner());
+      setMintRes(lm("sending"), "", false);
+      var tx = kind === "free" ? await c.mintFree(qty, { value: unit.mul(qty) }) : await c.mintPaid(qty, { value: unit.mul(qty) });
+      var link = " <a href=\"https://bscscan.com/tx/" + tx.hash + "\" target=\"_blank\" rel=\"noopener\">" + lm("viewTx") + "</a>";
+      setMintRes(lm("waiting") + link, "", false);
+      var rc = await tx.wait();
+      var ids = [];
+      var iface = new ethers.utils.Interface(MINT_ABI);
+      rc.logs.forEach(function(lg){ try { var p = iface.parseLog(lg); if (p.name === "SpookyMinted") ids.push("#" + p.args.tokenId.toString()); } catch(e){} });
+      setMintRes((ids.length > 1 ? lm("successMulti") : lm("success")) + ids.join(", ") + "." + link, "ok", false);
+      toast(lang === "zh" ? "铸造成功！" : "Mint successful!");
+    } catch(e){
+      var m = (e && e.message) ? e.message : String(e);
+      if ((e && e.code === 4001) || /user rejected|denied/i.test(m)) m = lm("cancelled");
+      setMintRes("✗ " + lm("failed") + m, "err", true);
+    }
+    mintBusy = false;
+    loadLive();
+  }
+  $("btnMintFree").addEventListener("click", function(){ doMint("free"); });
+  $("btnMintPaid").addEventListener("click", function(){ doMint("paid"); });
+  loadLive();
+  setInterval(loadLive, 45000);
+
 })();
 </script>
 <script>
