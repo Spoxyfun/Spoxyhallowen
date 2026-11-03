@@ -543,7 +543,6 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
 (function(){
   "use strict";
@@ -898,17 +897,7 @@
 
   renderGallery();
   renderTotals();
-  /* ---------- live mint (on-chain) ---------- */
-  var MINT_ABI = [
-    "function mintFree(uint256 qty) payable",
-    "function mintPaid(uint256 qty) payable",
-    "function mintOpen() view returns (bool)",
-    "function totalMinted() view returns (uint256)",
-    "function remaining() view returns (uint256)",
-    "function FREE_FEE() view returns (uint256)",
-    "function PAID_PRICE() view returns (uint256)",
-    "event SpookyMinted(address indexed minter, uint256 indexed tokenId, bool paid)"
-  ];
+  /* ---------- live mint (on-chain, raw JSON-RPC — tanpa library eksternal) ---------- */
   var LM = {
     en: { liveStateOpen:"LIVE — MINT IS OPEN", liveNoteLive:"Live numbers from the BNB Chain contract",
       mintFree:"Mint Free", mintPaid:"Mint Paid", notOpen:"Mint Not Open Yet",
@@ -917,6 +906,7 @@
       sending:"Sending… confirm the transaction in your wallet.", waiting:"Transaction sent — waiting for confirmation…",
       viewTx:"View on BscScan", success:"\u{1F389} Mint successful! You drew token ", successMulti:"\u{1F389} Mint successful! You drew tokens ",
       cancelled:"Transaction cancelled in the wallet.", failed:"Mint failed: ", closedToast:"Mint is not open yet — the owner has not opened it.",
+      loading:"Live mint status is still loading — please try again in a few seconds.",
       noLib:"Web3 library failed to load — check your connection and reload the page.", wrongChain:"Switch your wallet to BNB Chain (56) to mint.",
       progress:"Mint progress " },
     zh: { liveStateOpen:"已上线 — 铸造进行中", liveNoteLive:"来自 BNB Chain 合约的实时数据",
@@ -926,25 +916,52 @@
       sending:"正在发送……请在钱包中确认。", waiting:"交易已发送——等待确认……",
       viewTx:"在 BscScan 查看", success:"\u{1F389} 铸造成功！你抽到了代币 ", successMulti:"\u{1F389} 铸造成功！你抽到了代币 ",
       cancelled:"交易已在钱包中取消。", failed:"铸造失败：", closedToast:"铸造尚未开启——所有者还没有开启。",
+      loading:"铸造状态仍在加载——请几秒后重试。",
       noLib:"Web3 库加载失败——请检查网络并刷新页面。", wrongChain:"请将钱包切换到 BNB Chain（56）再铸造。",
       progress:"铸造进度 " }
   };
   function lm(k){ return (LM[lang] && LM[lang][k]) || LM.en[k]; }
-  var liveState = null, liveFee = null, livePrice = null, mintBusy = false;
+  var liveState = null, liveFeeWei = "100000000000000", livePriceWei = "1000000000000000", mintBusy = false;
   function fmtNum(n){ return n.toLocaleString("en-US"); }
-  function readProvider(){
-    var urls = ["https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc.publicnode.com"];
-    for (var i = 0; i < urls.length; i++){ try { return new ethers.providers.JsonRpcProvider(urls[i]); } catch(e){} }
-    return null;
+  var RPCS = ["https://bsc.publicnode.com", "https://bsc-rpc.publicnode.com", "https://bsc-mainnet.public.blastapi.io",
+    "https://bsc.blockpi.network/v1/rpc/public", "https://binance.llamarpc.com",
+    "https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org"];
+  function timeoutSignal(ms){ try { var c = new AbortController(); setTimeout(function(){ c.abort(); }, ms); return c.signal; } catch(e){ return undefined; } }
+  function rpcCall(method, params, allowNull){
+    var body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: method, params: params });
+    return new Promise(function(resolve, reject){
+      var pending = RPCS.length, done = false;
+      RPCS.forEach(function(url){
+        fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: body, signal: timeoutSignal(7000) })
+          .then(function(r){ return r.json(); })
+          .then(function(j){
+            if (done) return;
+            if (j && (typeof j.result !== "undefined") && (allowNull || j.result !== null)){ done = true; resolve(j.result); }
+            else if (--pending === 0){ done = true; reject(new Error("rpc")); }
+          })
+          .catch(function(){ if (--pending === 0 && !done){ done = true; reject(new Error("rpc")); } });
+      });
+    });
   }
+  function ethCall(data){ return rpcCall("eth_call", [{ to: CONTRACT_ADDRESS, data: data }, "latest"], false); }
   async function loadLive(){
-    if (!window.ethers || !CONTRACT_ADDRESS) { renderLive(); return; }
+    if (!CONTRACT_ADDRESS) { renderLive(); return; }
     try {
-      var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, readProvider());
-      var r = await Promise.all([c.mintOpen(), c.totalMinted(), c.remaining(), c.FREE_FEE(), c.PAID_PRICE()]);
-      liveState = { open: r[0], minted: r[1].toNumber(), remaining: r[2].toNumber() };
-      liveFee = r[3]; livePrice = r[4];
-    } catch(e){ /* pertahankan state terakhir */ }
+      var openHex = await ethCall("0x24bbd049");
+      var open = parseInt(openHex, 16) !== 0;
+      var minted = liveState ? liveState.minted : 0, rem = liveState ? liveState.remaining : 10000;
+      var extra = await Promise.all([
+        ethCall("0xa2309ff8").catch(function(){ return null; }),
+        ethCall("0x55234ec0").catch(function(){ return null; }),
+        ethCall("0xde4d1aad").catch(function(){ return null; }),
+        ethCall("0xc37b8362").catch(function(){ return null; })
+      ]);
+      if (extra[0] !== null) minted = parseInt(extra[0], 16);
+      if (extra[1] !== null) rem = parseInt(extra[1], 16);
+      if (extra[2] !== null) liveFeeWei = BigInt(extra[2]).toString();
+      if (extra[3] !== null) livePriceWei = BigInt(extra[3]).toString();
+      liveState = { open: open, minted: minted, remaining: rem };
+    } catch(e){ setTimeout(loadLive, 6000); }
     renderLive();
   }
   function renderLive(){
@@ -989,32 +1006,42 @@
   }
   async function doMint(kind){
     if (mintBusy) return;
-    if (!window.ethers){ toast(lm("noLib"), true); return; }
-    if (!liveState || !liveState.open){ toast(lm("closedToast"), true); return; }
+    if (!liveState){ toast(lm("loading"), true); loadLive(); return; }
+    if (!liveState.open){ toast(lm("closedToast"), true); return; }
+    if (!window.ethereum){
+      toast(lang === "zh" ? "未检测到钱包。请在钱包浏览器（MetaMask/OKX）中打开此页面。" : "No wallet detected. Open this page in a wallet browser (MetaMask/OKX).", true);
+      return;
+    }
     if (!connected){ await connect(); if (!connected) return; }
     var qty = kind === "free" ? freeQty : paidQty;
-    var unit = kind === "free" ? (liveFee || ethers.utils.parseEther("0.0001")) : (livePrice || ethers.utils.parseEther("0.001"));
     mintBusy = true; renderLive();
     try {
-      var prov = new ethers.providers.Web3Provider(window.ethereum);
-      var net = await prov.getNetwork();
-      if (net.chainId !== 56){
-        try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] }); } catch(e){}
-        prov = new ethers.providers.Web3Provider(window.ethereum);
-        net = await prov.getNetwork();
-        if (net.chainId !== 56) throw new Error(lm("wrongChain"));
+      var cid = await window.ethereum.request({ method: "eth_chainId" });
+      if (cid !== "0x38"){
+        await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] });
+        cid = await window.ethereum.request({ method: "eth_chainId" });
+        if (cid !== "0x38") throw new Error(lm("wrongChain"));
       }
-      var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, prov.getSigner());
+      var unit = BigInt(kind === "free" ? liveFeeWei : livePriceWei);
+      var value = "0x" + (unit * BigInt(qty)).toString(16);
+      var data = (kind === "free" ? "0xa4146733" : "0x26c7f77c") + qty.toString(16).padStart(64, "0");
       setMintRes(lm("sending"), "", false);
-      var tx = kind === "free" ? await c.mintFree(qty, { value: unit.mul(qty) }) : await c.mintPaid(qty, { value: unit.mul(qty) });
-      var link = " <a href=\"https://bscscan.com/tx/" + tx.hash + "\" target=\"_blank\" rel=\"noopener\">" + lm("viewTx") + "</a>";
+      var hash = await window.ethereum.request({ method: "eth_sendTransaction", params: [{ from: connected, to: CONTRACT_ADDRESS, data: data, value: value }] });
+      var link = " <a href=\"https://bscscan.com/tx/" + hash + "\" target=\"_blank\" rel=\"noopener\">" + lm("viewTx") + "</a>";
       setMintRes(lm("waiting") + link, "", false);
-      var rc = await tx.wait();
-      var ids = [];
-      var iface = new ethers.utils.Interface(MINT_ABI);
-      rc.logs.forEach(function(lg){ try { var p = iface.parseLog(lg); if (p.name === "SpookyMinted") ids.push("#" + p.args.tokenId.toString()); } catch(e){} });
-      setMintRes((ids.length > 1 ? lm("successMulti") : lm("success")) + ids.join(", ") + "." + link, "ok", false);
-      toast(lang === "zh" ? "铸造成功！" : "Mint successful!");
+      var rc = null;
+      for (var i = 0; i < 40 && !rc; i++){
+        await new Promise(function(r){ setTimeout(r, 3000); });
+        try { rc = await rpcCall("eth_getTransactionReceipt", [hash], true); } catch(e){}
+      }
+      if (rc && rc.status !== "0x1") throw new Error(lang === "zh" ? "交易在链上失败（revert）。" : "Transaction reverted on-chain.");
+      if (rc){
+        var TOPIC = "0x2e39da64f16aee70f5bde107d35193dc6d39685fd8e4132c5c8cc3c0354592de";
+        var ids = [];
+        (rc.logs || []).forEach(function(lg){ if (lg.topics && lg.topics[0] === TOPIC && lg.topics.length >= 3) ids.push("#" + parseInt(lg.topics[2], 16)); });
+        setMintRes((ids.length > 1 ? lm("successMulti") : lm("success")) + ids.join(", ") + "." + link, "ok", false);
+        toast(lang === "zh" ? "铸造成功！" : "Mint successful!");
+      }
     } catch(e){
       var m = (e && e.message) ? e.message : String(e);
       if ((e && e.code === 4001) || /user rejected|denied/i.test(m)) m = lm("cancelled");
@@ -1029,6 +1056,8 @@
   setInterval(loadLive, 45000);
 
 })();
+
+
 </script>
 <script>
 if ("serviceWorker" in navigator) {
