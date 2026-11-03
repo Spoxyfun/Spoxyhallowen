@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SPOOKY · Deploy &amp; Kelola Kontrak — Alat Pemilik</title>
+<title>SPOOKY · Deploy &amp; Manage Contract — Owner Tool</title>
 <meta name="robots" content="noindex">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <style>
@@ -31,61 +31,61 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>🎃 SPOOKY · Deploy &amp; Kelola Kontrak</h1>
-  <p class="sub">Alat pemilik untuk kontrak <b>Spooky Halloween (SPOOKY)</b> — ERC-721, BNB Chain, pool bersama 10.000 NFT.</p>
-  <div class="warn">🔐 <b>Alat pemilik.</b> Dompet Anda menandatangani semuanya; kunci tidak pernah meninggalkan dompet Anda. Kontrak belum diaudit — uji dulu di BNB Testnet bila ragu. <b>Mint TIDAK dibuka otomatis setelah deploy</b> — status awal selalu <b>TERTUTUP</b> dan hanya terbuka bila owner menandatangani transaksi “Buka Mint” di langkah 5.</div>
+  <h1>🎃 SPOOKY · Deploy &amp; Manage Contract</h1>
+  <p class="sub">Owner tool for the <b>Spooky Halloween (SPOOKY)</b> contract — ERC-721, BNB Chain, one shared pool of 10,000 NFTs.</p>
+  <div class="warn">🔐 <b>Owner tool.</b> Your wallet signs everything; keys never leave your wallet. The contract is unaudited — test on BNB Testnet first if in doubt. <b>Mint is NOT opened automatically after deploy</b> — it always starts <b>CLOSED</b> and only opens when the owner signs the “Open Mint” transaction in step 5.</div>
 
   <div class="card">
-    <h2>1. Jaringan &amp; Dompet</h2>
+    <h2>1. Network &amp; Wallet</h2>
     <div class="row">
-      <button id="btnConnect">Hubungkan Dompet</button>
+      <button id="btnConnect">Connect Wallet</button>
       <button class="sec" id="btnMainnet">BNB Chain (Mainnet)</button>
       <button class="sec" id="btnTestnet">BNB Testnet</button>
     </div>
-    <p class="kv" id="walletInfo">Dompet belum terhubung.</p>
+    <p class="kv" id="walletInfo">Wallet not connected.</p>
   </div>
 
   <div class="card">
-    <h2>2. Deploy Kontrak SpookyHalloween</h2>
-    <p class="dim">Nama: Spooky Halloween · Simbol: SPOOKY · Maks suplai: 10.000 · Free mint: 0,0001 BNB/NFT · Paid mint: 0,001 BNB/NFT · Maks 10 per transaksi. Tanpa argumen konstruktor. Setelah deploy berhasil, alamat kontrak terisi otomatis di langkah 3.</p>
-    <button id="btnDeploy" disabled>🚀 Deploy Kontrak</button>
+    <h2>2. Deploy the SpookyHalloween Contract</h2>
+    <p class="dim">Name: Spooky Halloween · Symbol: SPOOKY · Max supply: 10,000 · Free mint: 0.0001 BNB/NFT · Paid mint: 0.001 BNB/NFT · Max 10 per transaction. No constructor arguments. After a successful deploy, the contract address fills in automatically in step 3.</p>
+    <button id="btnDeploy" disabled>🚀 Deploy Contract</button>
     <p class="kv" id="deployInfo"></p>
-    <p class="dim">Ingat: deploy <b>tidak</b> membuka mint dan <b>tidak</b> memasang base URI. Keduanya langkah terpisah yang owner tandatangani sendiri (langkah 4 &amp; 5).</p>
+    <p class="dim">Remember: deploying does <b>not</b> open mint and does <b>not</b> set the base URI. Both are separate steps the owner signs themselves (steps 4 &amp; 5).</p>
   </div>
 
   <div class="card">
-    <h2>3. Alamat Kontrak</h2>
-    <input id="inpAddr" placeholder="0x… alamat kontrak hasil deploy">
+    <h2>3. Contract Address</h2>
+    <input id="inpAddr" placeholder="0x… deployed contract address">
     <div class="row">
-      <button class="sec" id="btnLoad">Muat Kontrak</button>
-      <button class="sec" id="btnCopy">Salin Alamat</button>
-      <a id="lnkScan" class="hidden" target="_blank" rel="noopener">Lihat di BscScan ↗</a>
+      <button class="sec" id="btnLoad">Load Contract</button>
+      <button class="sec" id="btnCopy">Copy Address</button>
+      <a id="lnkScan" class="hidden" target="_blank" rel="noopener">View on BscScan ↗</a>
     </div>
-    <p class="kv" id="statusInfo">Status kontrak belum dimuat.</p>
-    <p class="dim">Setelah deploy di mainnet, kirim alamat ini ke Muse untuk dipasang ke situs (CONTRACT_ADDRESS).</p>
+    <p class="kv" id="statusInfo">Contract status not loaded yet.</p>
+    <p class="dim">The live contract (0xC75B…4C3f) is already wired into the site — paste its address here to manage the base URI, mint status and withdrawals.</p>
   </div>
 
   <div class="card">
-    <h2>4. Base URI Metadata (tanda tangan owner)</h2>
+    <h2>4. Metadata Base URI (owner signature)</h2>
     <input id="inpBase" value="https://spoxydev.fun/metadata/">
     <button id="btnBase" disabled>Set Base URI</button>
     <p class="dim">tokenURI setiap NFT = base URI + id + “.json”, contoh: https://spoxydev.fun/metadata/1.json</p>
   </div>
 
   <div class="card">
-    <h2>5. Mint (tanda tangan owner)</h2>
-    <p class="big">Status mint: <span class="badge b-closed" id="mintBadge">—</span></p>
+    <h2>5. Mint (owner signature)</h2>
+    <p class="big">Mint status: <span class="badge b-closed" id="mintBadge">—</span></p>
     <div class="row">
-      <button id="btnOpen" disabled>🔓 Buka Mint</button>
-      <button class="danger" id="btnClose" disabled>🔒 Tutup Mint</button>
+      <button id="btnOpen" disabled>🔓 Open Mint</button>
+      <button class="danger" id="btnClose" disabled>🔒 Close Mint</button>
     </div>
-    <p class="dim">Mint hanya berubah status bila owner menandatangani transaksi ini. “Buka Mint” akan meminta konfirmasi sekali lagi sebelum dikirim ke dompet.</p>
+    <p class="dim">Mint status only changes when the owner signs this transaction. “Open Mint” asks for one more confirmation before it is sent to your wallet.</p>
   </div>
 
   <div class="card">
-    <h2>6. Tarik Dana (tanda tangan owner)</h2>
-    <p class="kv" id="balInfo">Saldo kontrak: —</p>
-    <button id="btnWithdraw" disabled>Tarik Semua BNB ke Owner</button>
+    <h2>6. Withdraw Funds (owner signature)</h2>
+    <p class="kv" id="balInfo">Contract balance: —</p>
+    <button id="btnWithdraw" disabled>Withdraw All BNB to Owner</button>
   </div>
 
   <div class="card">
@@ -105,7 +105,7 @@ let provider, signer, account, chainId, contract = null;
 
 const $ = id => document.getElementById(id);
 function log(msg){
-  const t = new Date().toLocaleTimeString("id-ID");
+  const t = new Date().toLocaleTimeString("en-GB");
   $("log").textContent += "["+t+"] "+msg+"\n";
   $("log").scrollTop = $("log").scrollHeight;
 }
@@ -113,7 +113,7 @@ function short(a){ return a ? a.slice(0,6)+"…"+a.slice(-4) : "—"; }
 function scanBase(){ return (CHAINS[chainId]||CHAINS[56]).scan; }
 
 async function connect(){
-  if(!window.ethereum){ log("❌ Dompet Web3 tidak ditemukan. Buka halaman ini dari browser dompet (MetaMask/Trust Wallet/Binance Wallet) atau pasang ekstensi MetaMask."); return; }
+  if(!window.ethereum){ log("❌ No Web3 wallet found. Open this page from a wallet browser (MetaMask/Trust Wallet/Binance Wallet) or install the MetaMask extension."); return; }
   provider = new ethers.providers.Web3Provider(window.ethereum);
   await provider.send("eth_requestAccounts", []);
   signer = provider.getSigner();
@@ -121,9 +121,9 @@ async function connect(){
   const net = await provider.getNetwork();
   chainId = net.chainId;
   const bal = await provider.getBalance(account);
-  $("walletInfo").textContent = "Terhubung: "+account+" · Jaringan: "+(CHAINS[chainId]?CHAINS[chainId].name:"ID "+chainId+" (bukan BNB Chain!)")+" · Saldo: "+ethers.utils.formatEther(bal)+" BNB";
+  $("walletInfo").textContent = "Connected: "+account+" · Network: "+(CHAINS[chainId]?CHAINS[chainId].name:"ID "+chainId+" (not a BNB Chain!)")+" · Balance: "+ethers.utils.formatEther(bal)+" BNB";
   $("btnDeploy").disabled = false;
-  log("Dompet terhubung: "+account+" di chain "+chainId);
+  log("Wallet connected: "+account+" on chain "+chainId);
   const saved = localStorage.getItem("spooky-contract-"+chainId);
   if(saved && !$("inpAddr").value){ $("inpAddr").value = saved; loadContract(); }
   window.ethereum.on("accountsChanged", ()=>location.reload());
@@ -131,45 +131,45 @@ async function connect(){
 }
 
 async function ensureChain(target){
-  if(!window.ethereum){ log("❌ Hubungkan dompet dulu."); return; }
+  if(!window.ethereum){ log("❌ Connect your wallet first."); return; }
   const c = CHAINS[target];
   try{ await window.ethereum.request({method:"wallet_switchEthereumChain", params:[{chainId:c.hex}]}); }
   catch(e){
     if(e.code === 4902){
       await window.ethereum.request({method:"wallet_addEthereumChain", params:[{chainId:c.hex, chainName:c.name, rpcUrls:[c.rpc], nativeCurrency:{name:c.currency, symbol:c.currency, decimals:18}, blockExplorerUrls:[c.scan]}]});
-    } else { log("❌ Gagal ganti jaringan: "+e.message); return; }
+    } else { log(❌ Failed to switch network: "+e.message); return; }
   }
   if(!provider) await connect(); else location.reload();
 }
 
 async function deploy(){
-  if(!signer){ log("❌ Hubungkan dompet dulu."); return; }
-  if(chainId !== 56 && chainId !== 97){ log("❌ Jaringan sekarang bukan BNB Chain/Testnet. Pindah jaringan dulu di langkah 1."); return; }
+  if(!signer){ log("❌ Connect your wallet first."); return; }
+  if(chainId !== 56 && chainId !== 97){ log("❌ The current network is not BNB Chain/Testnet. Switch networks in step 1 first."); return; }
   try{
     $("btnDeploy").disabled = true;
-    log("Membangun transaksi deploy… tanda tangani di dompet Anda.");
+    log("Building the deploy transaction… sign it in your wallet.");
     const factory = new ethers.ContractFactory(ABI, BYTECODE, signer);
     const c = await factory.deploy();
-    $("deployInfo").innerHTML = "Transaksi terkirim: <a target='_blank' rel='noopener' href='"+scanBase()+"/tx/"+c.deployTransaction.hash+"'>"+short(c.deployTransaction.hash)+"</a> — menunggu konfirmasi…";
+    $("deployInfo").innerHTML = "Transaction sent: <a target='_blank' rel='noopener' href='"+scanBase()+"/tx/"+c.deployTransaction.hash+"'>"+short(c.deployTransaction.hash)+"</a> — waiting for confirmation…";
     log("Tx deploy: "+c.deployTransaction.hash);
     await c.deployed();
     contract = c;
     $("inpAddr").value = c.address;
     localStorage.setItem("spooky-contract-"+chainId, c.address);
-    $("deployInfo").innerHTML = "✅ Kontrak terbit di: <b>"+c.address+"</b><br><a target='_blank' rel='noopener' href='"+scanBase()+"/address/"+c.address+"'>Lihat di BscScan ↗</a>";
-    log("✅ Deploy berhasil: "+c.address+" — mint masih TERTUTUP. Lanjut langkah 4 (base URI) bila siap.");
+    $("deployInfo").innerHTML = "✅ Contract deployed at: <b>"+c.address+"</b><br><a target='_blank' rel='noopener' href='"+scanBase()+"/address/"+c.address+"'>View on BscScan ↗</a>";
+    log("✅ Deploy succeeded: "+c.address+" — mint is still CLOSED. Continue to step 4 (base URI) when ready.");
     refreshStatus();
-  }catch(e){ log("❌ Deploy gagal/dibatalkan: "+(e.message||e)); }
+  }catch(e){ log("❌ Deploy failed/cancelled: "+(e.message||e)); }
   $("btnDeploy").disabled = false;
 }
 
 async function loadContract(){
   const addr = $("inpAddr").value.trim();
-  if(!ethers.utils.isAddress(addr)){ log("❌ Alamat kontrak tidak valid."); return; }
+  if(!ethers.utils.isAddress(addr)){ log("❌ Invalid contract address."); return; }
   if(!provider){ await connect(); if(!provider) return; }
   contract = new ethers.Contract(addr, ABI, signer || provider);
   localStorage.setItem("spooky-contract-"+chainId, addr);
-  log("Kontrak dimuat: "+addr);
+  log("Contract loaded: "+addr);
   refreshStatus();
 }
 
@@ -181,52 +181,52 @@ async function refreshStatus(){
     ]);
     const isOwner = account && owner.toLowerCase() === account.toLowerCase();
     $("statusInfo").innerHTML =
-      "Owner: "+owner+(isOwner?" (ini dompet Anda ✅)":" (bukan dompet terhubung ⚠️)")+"<br>"+
-      "Base URI: "+(base||"(belum diset)")+"<br>Saldo kontrak: "+ethers.utils.formatEther(bal)+" BNB";
+      "Owner: "+owner+(isOwner?" (this is your wallet ✅)":" (not the connected wallet ⚠️)")+"<br>"+
+      "Base URI: "+(base||"(not set)")+"<br>Contract balance: "+ethers.utils.formatEther(bal)+" BNB";
     const badge = $("mintBadge");
-    badge.textContent = open ? "TERBUKA" : "TERTUTUP";
+    badge.textContent = open ? "OPEN" : "CLOSED";
     badge.className = "badge " + (open ? "b-open" : "b-closed");
-    $("balInfo").textContent = "Saldo kontrak: "+ethers.utils.formatEther(bal)+" BNB";
+    $("balInfo").textContent = "Contract balance: "+ethers.utils.formatEther(bal)+" BNB";
     const lnk = $("lnkScan");
     lnk.href = scanBase()+"/address/"+contract.address; lnk.classList.remove("hidden");
     const canAct = !!signer && isOwner;
     $("btnBase").disabled = !canAct; $("btnOpen").disabled = !canAct || open;
     $("btnClose").disabled = !canAct || !open; $("btnWithdraw").disabled = !canAct;
-    if(signer && !isOwner) log("⚠️ Dompet terhubung bukan owner kontrak — tombol owner nonaktif.");
-  }catch(e){ log("❌ Gagal membaca status: "+(e.message||e)); }
+    if(signer && !isOwner) log("⚠️ The connected wallet is not the contract owner — owner buttons are disabled.");
+  }catch(e){ log("❌ Failed to read status: "+(e.message||e)); }
 }
 
 async function setBase(){
   const v = $("inpBase").value.trim();
   if(!v) return;
   try{
-    log("Mengirim setBaseURI(\""+v+"\") — tanda tangani di dompet.");
+    log("Sending setBaseURI(\""+v+"\") — sign it in your wallet.");
     const tx = await contract.setBaseURI(v);
     await tx.wait();
-    log("✅ Base URI terpasang: "+v);
+    log("✅ Base URI set: "+v);
     refreshStatus();
-  }catch(e){ log("❌ setBaseURI gagal/dibatalkan: "+(e.message||e)); }
+  }catch(e){ log("❌ setBaseURI failed/cancelled: "+(e.message||e)); }
 }
 
 async function setMint(open){
-  if(open && !confirm("Buka mint untuk publik? Transaksi ini ditandatangani owner dan langsung mengaktifkan mint di situs. Pastikan base URI sudah benar.")) { log("Buka mint dibatalkan owner."); return; }
+  if(open && !confirm("Open mint to the public? This transaction is signed by the owner and immediately enables minting on the site. Make sure the base URI is correct.")) { log("Open mint cancelled by owner."); return; }
   try{
-    log("Mengirim setMintOpen("+open+") — tanda tangani di dompet.");
+    log("Sending setMintOpen("+open+") — sign it in your wallet.");
     const tx = await contract.setMintOpen(open);
     await tx.wait();
-    log(open ? "✅ Mint DIBUKA oleh owner." : "✅ Mint DITUTUP oleh owner.");
+    log(open ? "✅ Mint OPENED by the owner." : "✅ Mint CLOSED by the owner.");
     refreshStatus();
-  }catch(e){ log("❌ setMintOpen gagal/dibatalkan: "+(e.message||e)); }
+  }catch(e){ log("❌ setMintOpen failed/cancelled: "+(e.message||e)); }
 }
 
 async function withdraw(){
   try{
-    log("Mengirim withdraw() — tanda tangani di dompet.");
+    log("Sending withdraw() — sign it in your wallet.");
     const tx = await contract.withdraw();
     await tx.wait();
-    log("✅ Dana ditarik ke owner.");
+    log("✅ Funds withdrawn to the owner.");
     refreshStatus();
-  }catch(e){ log("❌ Withdraw gagal/dibatalkan: "+(e.message||e)); }
+  }catch(e){ log("❌ Withdraw failed/cancelled: "+(e.message||e)); }
 }
 
 $("btnConnect").onclick = connect;
@@ -234,12 +234,12 @@ $("btnMainnet").onclick = ()=>ensureChain(56);
 $("btnTestnet").onclick = ()=>ensureChain(97);
 $("btnDeploy").onclick = deploy;
 $("btnLoad").onclick = loadContract;
-$("btnCopy").onclick = ()=>{ const v=$("inpAddr").value.trim(); if(v){ navigator.clipboard.writeText(v); log("Alamat disalin: "+v); } };
+$("btnCopy").onclick = ()=>{ const v=$("inpAddr").value.trim(); if(v){ navigator.clipboard.writeText(v); log("Address copied: "+v); } };
 $("btnBase").onclick = setBase;
 $("btnOpen").onclick = ()=>setMint(true);
 $("btnClose").onclick = ()=>setMint(false);
 $("btnWithdraw").onclick = withdraw;
-log("Siap. Langkah: 1) Hubungkan dompet & pilih jaringan → 2) Deploy → 3) Cek alamat → 4) Set base URI → 5) Buka mint HANYA bila sudah siap jualan.");
+log("Ready. Steps: 1) Connect wallet & pick a network → 2) Deploy → 3) Check the address → 4) Set base URI → 5) Open mint ONLY when you are ready to sell.");
 </script>
 </body>
 </html>
